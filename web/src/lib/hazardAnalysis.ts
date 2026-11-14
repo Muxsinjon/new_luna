@@ -91,15 +91,19 @@ export function footprint(d: HazardData, lat: number, lon: number, radiusM: numb
     projectedRadiusM: radius,
   }
 }
-export async function loadHazards(signal: AbortSignal): Promise<HazardData> {
-  const base = `${import.meta.env.BASE_URL}data/terrain/site01/hazards/`
+export async function loadHazards(signal: AbortSignal, siteId = 'site01'): Promise<HazardData> {
+  const base = `${import.meta.env.BASE_URL}data/terrain/${siteId}/hazards/`
   const response = await fetch(base + 'hazards.json', { signal })
   if (!response.ok) throw new Error('Scientific hazard metadata unavailable')
   const meta: HazardMeta = await response.json()
   if (
     meta.version !== 1 ||
-    meta.width !== 1601 ||
-    meta.height !== 1601 ||
+    !Number.isInteger(meta.width) ||
+    !Number.isInteger(meta.height) ||
+    meta.width < 3 ||
+    meta.height < 3 ||
+    meta.width > 4001 ||
+    meta.height > 4001 ||
     meta.dx !== 5 ||
     meta.dy !== -5 ||
     meta.quantum !== 0.001 ||

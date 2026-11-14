@@ -863,3 +863,19 @@ dialog.summary::backdrop {
 .terrain-ws .stage {
   min-width: 0;
 }
+.terrain-compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-3);
+}
+.terrain-compare .terrain-canvas {
+  height: clamp(280px, 45vh, 520px);
+}
+.terrain-pane {
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  .terrain-compare {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

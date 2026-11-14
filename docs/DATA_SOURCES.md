@@ -2,6 +2,16 @@
 
 Updated 2026-11-14. Reference directory: user-supplied `Lunar_Landing_Navigator_NASA_JPL_Data_Sources.docx` (17 categories). That document is a discovery directory, not verification. Status below distinguishes existing integration, newly verified products and future/uninspected collections. No remote publication is implied.
 
+## Milestone 3 multi-site records
+
+| Record | Product / file | Use | Notes |
+|---|---|---|---|
+| PGDA product 78 Site04 | `Site04_final_adj_5mpp_surf/toterr/slp.tif` | 20 m mesh, height RMS, OLS slope/roughness; NASA slope as a cross-check only | README name "Shackleton rim"; surf SHA-256 pinned `38ff70db…`; 3200² at 5 m |
+| PGDA product 78 Site06 | `Site06_final_adj_5mpp_surf/toterr/slp.tif` | as above | README name "Nobile rim 1"; missing from the HTML file index but served at the documented path and verified as a GeoTIFF; surf SHA-256 pinned `cca17e80…`; 4000² at 5 m |
+| Terrain index | `web/public/data/terrain/index.json` | site list, product, crop centre and its source, extent, source URL and hash | written by `terrain_sites.py --index` |
+
+The crop centres for Site04 and Site06 are the DEM centre pixels, because no landing coordinate is published. Same frame (MOON_ME/DE421), east-positive longitude, units (m, °, m RMS), NaN / 65535 NoData and 5 m / 20 m resolutions as Site01.
+
 ## Milestone 2 active scientific records
 
 All three local Site01 products are NASA GSFC PGDA / LRO LOLA, [product 78](https://pgda.gsfc.nasa.gov/products/78), Barker et al. (2021), doi:10.1016/j.pss.2020.105119. Prefix for exact files: `https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/Site01/`.

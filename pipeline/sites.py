@@ -20,6 +20,13 @@ SITES = [
          lat=-84.6, lon=31.0, source="IAU feature centre, via Wikipedia 'Mons Mouton'"),
     dict(id="shackleton-floor", name="Shackleton crater floor (permanent shadow)", group="South pole feature",
          lat=-89.67, lon=129.78, source="IAU feature centre (Gazetteer of Planetary Nomenclature)", verify=True),
+    # --- Milestone 3 processed 5 m terrain sites: centre pixel of each NASA PGDA product 78 DEM (no landing point claimed)
+    dict(id="shackleton-rim-site04", name="Shackleton Rim (PGDA Site04 DEM centre)", group="Artemis III candidate",
+         lat=-89.76674, lon=-171.89281,
+         source="NASA GSFC PGDA product 78 (Barker et al. 2021), Site04 5 m DEM centre pixel: 89.76674 S, 188.10719 E"),
+    dict(id="nobile-rim-1-site06", name="Nobile Rim 1 (PGDA Site06 DEM centre)", group="Artemis III candidate",
+         lat=-85.43812, lon=37.36812,
+         source="NASA GSFC PGDA product 78 (Barker et al. 2021), Site06 5 m DEM centre pixel: 85.43812 S, 37.36812 E"),
     # --- CLPS / commercial ---------------------------------------------------------------
     dict(id="im-2", name="IM-2 Athena (Intuitive Machines)", group="CLPS / commercial",
          lat=-84.7906, lon=29.1958, source="Wikipedia 'IM-2': 84°47′26″S 29°11′45″E"),

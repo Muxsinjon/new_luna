@@ -1,9 +1,20 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { DEFAULT_HAZARD_SETTINGS, type HazardSettings } from '../components/hazardTexture'
 import HazardPanel, { type HazardVisual } from '../components/HazardPanel'
 import SitePair from '../components/SitePair'
-import TerrainCanvas from '../components/TerrainCanvas'
+import TerrainCanvas, { type CameraLink } from '../components/TerrainCanvas'
+import TerrainComparePane, { type PaneResult } from '../components/TerrainComparePane'
+import TerrainComparison from '../components/TerrainComparison'
 import { useStore } from '../lib/store'
-import { loadTerrainAsset, sampleGrid, type SurfacePoint, type TerrainAsset } from '../lib/terrainMesh'
+import {
+  loadTerrainAsset,
+  loadTerrainIndex,
+  sampleGrid,
+  terrainSiteFor,
+  type SurfacePoint,
+  type TerrainAsset,
+  type TerrainIndex,
+} from '../lib/terrainMesh'
 
 export default function TerrainExplorer() {
   const { s, set, site, addCustom, customBusy, theme } = useStore()
@@ -16,11 +27,39 @@ export default function TerrainExplorer() {
     [pickError, setPickError] = useState(''),
     [imagery, setImagery] = useState(false)
   const [visual, setVisual] = useState<HazardVisual | null>(null)
+  const [index, setIndex] = useState<TerrainIndex | null>(null),
+    [mode, setMode] = useState<'single' | 'compare'>('single'),
+    [settings, setSettings] = useState<HazardSettings>(DEFAULT_HAZARD_SETTINGS),
+    [linked, setLinked] = useState(true),
+    [results, setResults] = useState<{ A: PaneResult | null; B: PaneResult | null }>({ A: null, B: null })
+  const link = useMemo<CameraLink>(() => ({ members: new Map() }), [])
+  const patch = useCallback((p: Partial<HazardSettings>) => setSettings((v) => ({ ...v, ...p })), [])
+  const onResult = useCallback((slot: 'A' | 'B', r: PaneResult | null) => setResults((v) => ({ ...v, [slot]: r })), [])
   const st = site(s.surfaceSite === 'A' ? s.siteA : s.siteB)
+  const siteA = site(s.siteA),
+    siteB = site(s.siteB)
+  const terrainA = index ? terrainSiteFor(index.sites, siteA.id, siteA.lat, siteA.lon) : null,
+    terrainB = index ? terrainSiteFor(index.sites, siteB.id, siteB.lat, siteB.lon) : null
+  const info = index ? terrainSiteFor(index.sites, st.id, st.lat, st.lon) : null
+  const terrainId = info?.id ?? 'site01'
   useEffect(() => {
+    if (index) return // loaded once; a retry after an asset failure must not restart the asset load
+    const abort = new AbortController()
+    loadTerrainIndex(abort.signal).then(
+      (i) => {
+        if (!abort.signal.aborted) setIndex(i)
+      },
+      (e: Error) => {
+        if (!abort.signal.aborted) setError(e.message)
+      },
+    )
+    return () => abort.abort()
+  }, [attempt, index])
+  useEffect(() => {
+    if (!index) return
     const abort = new AbortController()
     let loaded: TerrainAsset | null = null
-    loadTerrainAsset(abort.signal).then(
+    loadTerrainAsset(abort.signal, terrainId).then(
       (a) => {
         if (abort.signal.aborted) {
           if (a.imageUrl) URL.revokeObjectURL(a.imageUrl)
@@ -37,8 +76,16 @@ export default function TerrainExplorer() {
       abort.abort()
       if (loaded?.imageUrl) URL.revokeObjectURL(loaded.imageUrl)
     }
-  }, [attempt])
-  const elevation = asset ? sampleGrid(asset, st.lat, st.lon) : null
+  }, [attempt, index, terrainId])
+  const shown = asset && (asset.meta.siteId ?? 'site01') === terrainId ? asset : null
+  const [pickedFor, setPickedFor] = useState(terrainId)
+  if (pickedFor !== terrainId) {
+    setPickedFor(terrainId)
+    setPicked(null)
+    setLat('')
+    setLon('')
+  }
+  const elevation = shown && info ? sampleGrid(shown, st.lat, st.lon) : null
   const current = useMemo(
     () => (elevation === null ? null : { lat: st.lat, lon: st.lon, elevationM: elevation }),
     [st.lat, st.lon, elevation],
@@ -57,7 +104,7 @@ export default function TerrainExplorer() {
       setPickError('Planner terrain failed to load. Try again.')
     }
   }
-  const rms = asset && picked ? sampleGrid(asset, picked.lat, picked.lon, asset.errors) : null
+  const rms = shown && picked ? sampleGrid(shown, picked.lat, picked.lon, shown.errors) : null
   return (
     <div className="workspace terrain-ws">
       <aside className="rail">
@@ -68,24 +115,83 @@ export default function TerrainExplorer() {
           <div>
             <h2 id="terrain-title">3D lunar terrain explorer</h2>
             <p className="lede">
-              Connecting Ridge, NASA LOLA Site01. Explore an actual lunar elevation mesh and choose a mission location.
+              {mode === 'compare'
+                ? 'Site A and Site B side by side on NASA LOLA 5 m terrain, screened with one shared footprint and thresholds.'
+                : `${info?.name ?? 'Connecting Ridge'}, NASA LOLA ${info?.product ?? 'Site01'}. Explore an actual lunar elevation mesh and choose a mission location.`}
             </p>
           </div>
-          <div className="seg" role="radiogroup" aria-label="Terrain site shown">
-            {(['A', 'B'] as const).map((slot) => (
+          <div className="seg" role="radiogroup" aria-label="Terrain layout">
+            {(
+              [
+                ['single', 'One site'],
+                ['compare', 'Compare A and B'],
+              ] as const
+            ).map(([m, text]) => (
               <button
                 type="button"
-                key={slot}
+                key={m}
                 role="radio"
-                aria-checked={s.surfaceSite === slot}
-                className={s.surfaceSite === slot ? 'on' : ''}
-                onClick={() => set({ surfaceSite: slot })}
+                aria-checked={mode === m}
+                className={mode === m ? 'on' : ''}
+                onClick={() => setMode(m)}
               >
-                Site {slot}
+                {text}
               </button>
             ))}
           </div>
+          {mode === 'single' && (
+            <div className="seg" role="radiogroup" aria-label="Terrain site shown">
+              {(['A', 'B'] as const).map((slot) => (
+                <button
+                  type="button"
+                  key={slot}
+                  role="radio"
+                  aria-checked={s.surfaceSite === slot}
+                  className={s.surfaceSite === slot ? 'on' : ''}
+                  onClick={() => set({ surfaceSite: slot })}
+                >
+                  Site {slot}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+        {index && (
+          <div className="terrain-toolbar">
+            {(['A', 'B'] as const).map((slot) => {
+              const current = slot === 'A' ? terrainA : terrainB
+              return (
+                <label className="field" key={slot}>
+                  <span>Site {slot} terrain</span>
+                  <select
+                    aria-label={`Site ${slot} terrain`}
+                    value={current?.id ?? ''}
+                    onChange={(e) => {
+                      const t = index.sites.find((x) => x.id === e.target.value)
+                      if (t) set(slot === 'A' ? { siteA: t.plannerId } : { siteB: t.plannerId })
+                    }}
+                  >
+                    {!current && <option value="">No processed terrain at this site</option>}
+                    {index.sites.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name} ({t.product})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )
+            })}
+            <button type="button" className="btn" onClick={() => set({ ws: 'compare' })}>
+              Sun and Earth charts for these sites
+            </button>
+            <button type="button" className="btn" onClick={() => set({ ws: 'finder' })}>
+              Mission windows for these sites
+            </button>
+            <button type="button" className="btn" onClick={() => set({ ws: 'surface' })}>
+              Surface view
+            </button>
+          </div>
+        )}
         {error ? (
           <div role="alert">
             <p>{error}</p>
@@ -99,18 +205,63 @@ export default function TerrainExplorer() {
               Retry terrain loading
             </button>
           </div>
-        ) : !asset ? (
+        ) : mode === 'compare' && index ? (
+          <>
+            <div className="terrain-toolbar">
+              <label className="toggle">
+                <input type="checkbox" checked={linked} onChange={(e) => setLinked(e.target.checked)} /> Link cameras (same scale and
+                viewing direction)
+              </label>
+            </div>
+            <p className="hint">
+              Linked views share the camera offset in metres around each site, so both terrains appear at the same physical scale and
+              orientation (X east, Y up, Z south). The two crops are separate places; side by side does not mean adjacent.
+            </p>
+            <SharedCriteria settings={settings} onSettings={patch} />
+            <div className="terrain-compare">
+              {(['A', 'B'] as const).map((slot) => {
+                const t = slot === 'A' ? terrainA : terrainB,
+                  ps = slot === 'A' ? siteA : siteB
+                return t ? (
+                  <TerrainComparePane
+                    key={t.id + ':' + ps.id}
+                    slot={slot}
+                    info={t}
+                    centre={{ lat: ps.lat, lon: ps.lon }}
+                    settings={settings}
+                    theme={theme}
+                    link={link}
+                    linked={linked}
+                    onResult={onResult}
+                  />
+                ) : (
+                  <section className="panel terrain-pane" key={slot} data-testid={`terrain-pane-${slot}`}>
+                    <h3>
+                      Site {slot}: {ps.name}
+                    </h3>
+                    <p>No processed 5 m terrain covers this site, so it is marked insufficient data. Choose a terrain site above.</p>
+                  </section>
+                )
+              })}
+            </div>
+            <TerrainComparison
+              a={{ name: `Site A (${siteA.name})`, info: terrainA, result: results.A?.siteId === terrainA?.id ? results.A : null }}
+              b={{ name: `Site B (${siteB.name})`, info: terrainB, result: results.B?.siteId === terrainB?.id ? results.B : null }}
+              settings={settings}
+            />
+          </>
+        ) : !shown ? (
           <p role="status">Loading verified NASA terrain…</p>
         ) : (
           <>
             <p className="terrain-quality">
-              Real NASA PGDA Site01 elevation: 5 m source pixels, 20 m mesh spacing, 8 × 8 km coverage. True horizontal and vertical scale
-              (1×), including lunar curvature.
+              Real NASA PGDA {shown.meta.product ?? 'Site01'} elevation: 5 m source pixels, 20 m mesh spacing, 8 × 8 km coverage. True
+              horizontal and vertical scale (1×), including lunar curvature.
             </p>
             <p className="muted">
               {st.name}. About 90% of native pixels are interpolated between laser returns. Pixel spacing is not measurement accuracy.
             </p>
-            {asset.meta.imagery && (
+            {shown.meta.imagery && (
               <p className="hint" data-testid="registration-warning">
                 LROC WAC registration is unverified. The texture is off by default and available only as optional context; geographic
                 reprojection does not establish landmark alignment accuracy.
@@ -125,14 +276,14 @@ export default function TerrainExplorer() {
                   onChange={(e) => setImagery(e.target.value === 'imagery')}
                 >
                   <option value="elevation">Shaded elevation</option>
-                  {asset.meta.imagery && <option value="imagery">LROC WAC — registration unverified</option>}
+                  {shown.meta.imagery && <option value="imagery">LROC WAC — registration unverified</option>}
                 </select>
               </label>
             </div>
             {current ? (
               <TerrainCanvas
                 key={st.id + ':' + attempt + ':' + imagery}
-                asset={asset}
+                asset={shown}
                 site={current}
                 selectedPoint={picked}
                 imagery={imagery}
@@ -142,7 +293,7 @@ export default function TerrainExplorer() {
               />
             ) : (
               <div className="panel">
-                <p>This site is outside the Site01 terrain coverage. No terrain is extrapolated.</p>
+                <p>This site is outside every processed terrain crop. No terrain is extrapolated.</p>
                 <button
                   className="btn"
                   onClick={() => set(s.surfaceSite === 'A' ? { siteA: 'connecting-ridge' } : { siteB: 'connecting-ridge' })}
@@ -156,7 +307,7 @@ export default function TerrainExplorer() {
               the camera buttons. Click terrain to select a point. Magenta marks the mission site; cyan marks your picked point. Local axes:
               X east, Y up, Z south. Inspection lighting does not model mission sunlight.
             </p>
-            {imagery && <p className="hint">{asset.meta.imagery?.note}</p>}
+            {imagery && <p className="hint">{shown.meta.imagery?.note}</p>}
             <section className="panel">
               <h3>Selected surface point</h3>
               <p
@@ -187,7 +338,7 @@ export default function TerrainExplorer() {
                     setPickError('Enter a valid lunar latitude and east longitude.')
                     return
                   }
-                  const h = sampleGrid(asset, la, lo)
+                  const h = sampleGrid(shown, la, lo)
                   if (h === null) {
                     setPickError('Coordinates are outside valid terrain coverage.')
                     return
@@ -217,26 +368,36 @@ export default function TerrainExplorer() {
                 regional DEM over 250 km, not this local mesh.
               </p>
             </section>
-            <HazardPanel asset={asset} point={picked} theme={theme} onVisual={setVisual} />
+            <HazardPanel
+              key={terrainId}
+              asset={shown}
+              point={picked}
+              theme={theme}
+              onVisual={setVisual}
+              siteId={terrainId}
+              siteName={shown.meta.product ?? 'Site01'}
+              settings={settings}
+              onSettings={patch}
+            />
             <details className="panel">
               <summary>Sources, uncertainty and image alignment</summary>
               <p>
                 <a href="https://pgda.gsfc.nasa.gov/products/78" target="_blank" rel="noreferrer">
-                  NASA GSFC PGDA, Barker et al. (2021), Site01 adjusted LOLA DEM
+                  NASA GSFC PGDA, Barker et al. (2021), {shown.meta.product ?? 'Site01'} adjusted LOLA DEM
                 </a>
               </p>
-              <p>{asset.meta.uncertaintyNote} The product uses MOON_ME/DE421; existing astronomical calculations are unchanged.</p>
+              <p>{shown.meta.uncertaintyNote} The product uses MOON_ME/DE421; existing astronomical calculations are unchanged.</p>
               <p>
-                Mesh decimation relative to the native 5 m DEM adds {asset.meta.decimationResidualM.rms.toFixed(2)} m RMS error over this
-                crop (maximum {asset.meta.decimationResidualM.maxAbs.toFixed(2)} m). These residuals are separate from source uncertainty.
+                Mesh decimation relative to the native 5 m DEM adds {shown.meta.decimationResidualM.rms.toFixed(2)} m RMS error over this
+                crop (maximum {shown.meta.decimationResidualM.maxAbs.toFixed(2)} m). These residuals are separate from source uncertainty.
               </p>
               <p>
-                DEM SHA-256: <code className="terrain-hash">{asset.meta.sources.surf.sha256}</code>
+                DEM SHA-256: <code className="terrain-hash">{shown.meta.sources.surf.sha256}</code>
               </p>
-              {asset.meta.imagery && (
+              {shown.meta.imagery && (
                 <p>
-                  <a href={asset.meta.imagery.url} target="_blank" rel="noreferrer">
-                    {asset.meta.imagery.title}
+                  <a href={shown.meta.imagery.url} target="_blank" rel="noreferrer">
+                    {shown.meta.imagery.title}
                   </a>
                   . Map-coordinate reprojection is checked, but image-to-terrain registration is unverified. No independent landmark
                   residual or subpixel image/DEM co-registration has been established. WAC is coarse context imagery, not high-resolution
@@ -248,5 +409,81 @@ export default function TerrainExplorer() {
         )}
       </section>
     </div>
+  )
+}
+
+function SharedCriteria({ settings, onSettings }: { settings: HazardSettings; onSettings: (p: Partial<HazardSettings>) => void }) {
+  const num = (v: number) => (Number.isFinite(v) ? v : '')
+  return (
+    <fieldset className="panel">
+      <legend>Shared screening criteria (applied identically to both sites)</legend>
+      <div className="terrain-toolbar">
+        <label className="field">
+          Overlay layer
+          <select
+            aria-label="Overlay layer"
+            value={settings.layer}
+            onChange={(e) => onSettings({ layer: e.target.value as HazardSettings['layer'] })}
+          >
+            <option value="elevation">Elevation</option>
+            <option value="slope">Slope (3×3 OLS)</option>
+            <option value="roughness">Roughness</option>
+            <option value="hazard">Hazard Assessment</option>
+          </select>
+        </label>
+        <label className="field">
+          Maximum slope (degrees; 15 m support)
+          <input
+            aria-label="Shared maximum slope"
+            type="number"
+            min="0"
+            max="90"
+            step="1"
+            value={num(settings.maxSlope)}
+            onChange={(e) => onSettings({ maxSlope: e.target.valueAsNumber })}
+          />
+        </label>
+        <label className="field">
+          Maximum roughness (m RMS; 25 m support)
+          <input
+            aria-label="Shared maximum roughness"
+            type="number"
+            min="0"
+            step="0.05"
+            value={num(settings.maxRough)}
+            onChange={(e) => onSettings({ maxRough: e.target.valueAsNumber })}
+          />
+        </label>
+        <label className="field">
+          Footprint radius (m)
+          <input
+            aria-label="Shared footprint radius"
+            type="number"
+            min="5"
+            max="2000"
+            step="25"
+            value={num(settings.radius)}
+            onChange={(e) => onSettings({ radius: e.target.valueAsNumber })}
+          />
+        </label>
+        <label className="field">
+          Required share meeting both criteria (%)
+          <input
+            aria-label="Required share meeting both criteria"
+            type="number"
+            min="0"
+            max="100"
+            step="5"
+            value={num(settings.minMeetsPct)}
+            onChange={(e) => onSettings({ minMeetsPct: e.target.valueAsNumber })}
+          />
+        </label>
+      </div>
+      <p className="hint">
+        Threshold defaults are illustrative, not NASA safety standards. Both sites use the same 5 m native layers, the same estimators (3 ×
+        3 OLS slope, 5 × 5 detrended RMS roughness), the same footprint radius and the same thresholds. Overlay legend: slope and roughness
+        ramp blue to orange (≥30°, ≥1 m); hazard green meets, orange exceeds, gray insufficient data.
+      </p>
+    </fieldset>
   )
 }

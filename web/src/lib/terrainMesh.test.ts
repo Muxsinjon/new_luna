@@ -1,7 +1,16 @@
 import { readFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
-import { meshArrays, localToSurface, surfaceToLocal, sampleGrid, validateTerrain, type TerrainAsset } from './terrainMesh'
+import {
+  meshArrays,
+  localToSurface,
+  surfaceToLocal,
+  sampleGrid,
+  terrainSiteFor,
+  validateTerrain,
+  type TerrainAsset,
+  type TerrainSiteInfo,
+} from './terrainMesh'
 import { polarLatLon } from './terrain'
 import { DEFAULT_STATE, fromHash, toHash } from './state'
 const base = new URL('../../public/data/terrain/site01/', import.meta.url)
@@ -81,6 +90,41 @@ describe('real NASA Site01 terrain', () => {
     for (const p of reference.points) {
       expect(sampleGrid(asset, p.lat, p.lon)).toBeCloseTo(p.mesh20mBilinearM, 5)
       expect(Math.abs(sampleGrid(asset, p.lat, p.lon)! - p.native5mBilinearM)).toBeLessThan(meta.decimationResidualM.maxAbs + 0.02)
+    }
+  })
+})
+
+describe('processed terrain site lookup (Milestone 3)', () => {
+  const index = JSON.parse(readFileSync('public/data/terrain/index.json', 'utf8')) as { sites: TerrainSiteInfo[] }
+  it('links planner sites first, then crop extent, and never extrapolates', () => {
+    expect(index.sites.map((t) => t.id)).toEqual(['site01', 'site04', 'site06'])
+    expect(terrainSiteFor(index.sites, 'nobile-rim-1-site06', 0, 0)?.id).toBe('site06')
+    expect(terrainSiteFor(index.sites, 'custom:x', -89.5343, 209.9477)?.id).toBe('site01')
+    const s6 = index.sites[2]
+    expect(terrainSiteFor(index.sites, 'custom:y', s6.centre.lat, s6.centre.lon)?.id).toBe('site06')
+    expect(terrainSiteFor(index.sites, 'apollo-11', 0.67409, 23.47298)).toBeNull()
+    expect(terrainSiteFor(index.sites, 'custom:z', -85.0, 37.37)).toBeNull() // ~50 km outside the Site06 crop
+  })
+  it('every planner-linked terrain site exists in the planner catalogue at its crop centre', () => {
+    const planner = JSON.parse(readFileSync('public/data/sites.json', 'utf8')) as { sites: { id: string; lat: number; lon: number }[] }
+    for (const t of index.sites) {
+      const p = planner.sites.find((s) => s.id === t.plannerId)!
+      expect(p).toBeTruthy()
+      expect(Math.abs(p.lat - t.centre.lat)).toBeLessThan(1e-5)
+      expect(Math.abs(((p.lon - t.centre.lon + 540) % 360) - 180)).toBeLessThan(1e-5)
+    }
+  })
+  it('Site04 and Site06 assets carry their own site id, product and identical method parameters', () => {
+    for (const id of ['site04', 'site06']) {
+      const m = JSON.parse(readFileSync(`public/data/terrain/${id}/terrain.json`, 'utf8'))
+      const h = JSON.parse(readFileSync(`public/data/terrain/${id}/hazards/hazards.json`, 'utf8'))
+      expect(m.siteId).toBe(id)
+      expect([m.width, m.height, m.dx, m.dy, m.sourceResolutionM]).toEqual([401, 401, 20, -20, 5])
+      expect([h.width, h.height, h.dx, h.dy, h.slopeSupportM, h.roughnessSupportM, h.quantum, h.noData]).toEqual([
+        1601, 1601, 5, -5, 15, 25, 0.001, 65535,
+      ])
+      expect(h.sourceSha256).toBe(m.sources.surf.sha256)
+      expect([h.x0 - m.x0, h.y0 - m.y0]).toEqual([0, 0])
     }
   })
 })

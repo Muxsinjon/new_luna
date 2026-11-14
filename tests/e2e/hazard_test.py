@@ -1,5 +1,5 @@
 """Milestone 2 acceptance against independent Float32 scientific GeoTIFFs."""
-import json,re,hashlib
+import json,os,re,hashlib
 from pathlib import Path
 import numpy as np
 import rasterio
@@ -8,7 +8,7 @@ from playwright.sync_api import sync_playwright,expect
 import sys
 base=sys.argv[1] if len(sys.argv)>1 else 'http://127.0.0.1:4173/'
 with sync_playwright() as p:
- b=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--enable-unsafe-swiftshader'])
+ b=p.chromium.launch(executable_path=os.environ.get('CHROMIUM') or ('/usr/bin/chromium' if os.path.exists('/usr/bin/chromium') else None),headless=True,args=['--enable-unsafe-swiftshader'])
  page=b.new_page(viewport={'width':1440,'height':1000});errors=[];failed=[]
  page.on('pageerror',lambda e:errors.append(str(e)));page.on('requestfailed',lambda r:failed.append(r.url))
  page.goto(base+'#ws=terrain&a=connecting-ridge&sv=A')

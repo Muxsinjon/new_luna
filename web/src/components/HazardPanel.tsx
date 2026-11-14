@@ -1,17 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import * as THREE from 'three'
-import {
-  analysisAt,
-  classify,
-  footprint,
-  loadHazards,
-  valuesAtIndex,
-  type AnalysisLayer,
-  type Criteria,
-  type HazardData,
-} from '../lib/hazardAnalysis'
+import type * as THREE from 'three'
+import { analysisAt, classify, footprint, loadHazards, type AnalysisLayer, type Criteria, type HazardData } from '../lib/hazardAnalysis'
 import { type SurfacePoint, type TerrainAsset } from '../lib/terrainMesh'
-import { cssVar, hexToRgb } from '../lib/theme'
+import { hazardAligned, useHazardTexture, type HazardSettings } from './hazardTexture'
 export interface HazardVisual {
   texture: THREE.Texture | null
   footprint: { point: SurfacePoint; radius: number } | null
@@ -22,90 +13,48 @@ export default function HazardPanel({
   point,
   theme,
   onVisual,
+  siteId = 'site01',
+  siteName = 'Site01',
+  settings,
+  onSettings,
 }: {
   asset: TerrainAsset
   point: SurfacePoint | null
   theme: string
   onVisual: (v: HazardVisual) => void
+  siteId?: string
+  siteName?: string
+  /** shared criteria when the panel is driven by the dual-site comparison */
+  settings: HazardSettings
+  onSettings: (patch: Partial<HazardSettings>) => void
 }) {
   const [data, setData] = useState<HazardData | null>(null),
     [error, setError] = useState(''),
     [retry, setRetry] = useState(0)
-  const [layer, setLayer] = useState<AnalysisLayer>('elevation'),
-    [maxSlope, setMaxSlope] = useState(10),
-    [maxRough, setMaxRough] = useState(0.3),
-    [radius, setRadius] = useState(100)
+  const { layer, maxSlope, maxRough, radius } = settings
+  const setLayer = (v: AnalysisLayer) => onSettings({ layer: v }),
+    setMaxSlope = (v: number) => onSettings({ maxSlope: v }),
+    setMaxRough = (v: number) => onSettings({ maxRough: v }),
+    setRadius = (v: number) => onSettings({ radius: v })
   useEffect(() => {
     const a = new AbortController()
-    loadHazards(a.signal)
+    loadHazards(a.signal, siteId)
       .then((d) => {
-        if (
-          d.meta.x0 !== asset.meta.x0 ||
-          d.meta.y0 !== asset.meta.y0 ||
-          d.meta.sourceSha256 !== asset.meta.sources.surf.sha256 ||
-          (d.meta.width - 1) * d.meta.dx !== (asset.meta.width - 1) * asset.meta.dx ||
-          (d.meta.height - 1) * d.meta.dy !== (asset.meta.height - 1) * asset.meta.dy
-        )
-          throw new Error('Scientific layer does not align with elevation source')
+        if (!hazardAligned(d, asset)) throw new Error('Scientific layer does not align with elevation source')
         if (!a.signal.aborted) setData(d)
       })
       .catch((e: Error) => {
         if (!a.signal.aborted) setError(e.message)
       })
     return () => a.abort()
-  }, [asset, retry])
+  }, [asset, retry, siteId])
   const criteria = useMemo<Criteria>(() => ({ slope: maxSlope, roughness: maxRough }), [maxSlope, maxRough])
   const values = data && point ? analysisAt(data, point.lat, point.lon) : null
   const stats = useMemo(
     () => (data && point ? footprint(data, point.lat, point.lon, radius, point.elevationM, criteria) : null),
     [data, point, radius, criteria],
   )
-  const texture = useMemo(() => {
-    if (!data || layer === 'elevation') return null
-    const canvas = document.createElement('canvas')
-    canvas.width = data.meta.width
-    canvas.height = data.meta.height
-    const ctx = canvas.getContext('2d')!
-    const image = ctx.createImageData(canvas.width, canvas.height)
-    const low = hexToRgb(cssVar('--c-earth')),
-      high = hexToRgb(cssVar('--c-warn')),
-      yes = hexToRgb(cssVar('--c-both')),
-      none = hexToRgb(cssVar('--c-none'))
-    for (let i = 0; i < data.slope.length; i++) {
-      const v = valuesAtIndex(data, i),
-        state = classify(v.slope, v.roughness, criteria)
-      const value = layer === 'slope' ? v.slope : v.roughness
-      const t = value === null ? 0 : Math.max(0, Math.min(1, value / (layer === 'slope' ? 30 : 1)))
-      const rgb =
-        layer === 'hazard'
-          ? state === 'meets'
-            ? yes
-            : state === 'exceeds'
-              ? high
-              : none
-          : value === null
-            ? none
-            : low.map((c, j) => Math.round(c * (1 - t) + high[j] * t))
-      image.data.set([...rgb, 255], i * 4)
-    }
-    ctx.putImageData(image, 0, 0)
-    const result = new THREE.CanvasTexture(canvas)
-    result.colorSpace = THREE.SRGBColorSpace
-    result.minFilter = THREE.NearestFilter
-    result.magFilter = THREE.NearestFilter
-    result.generateMipmaps = false
-    result.repeat.set((canvas.width - 1) / canvas.width, (canvas.height - 1) / canvas.height)
-    result.offset.set(0.5 / canvas.width, 0.5 / canvas.height)
-    return result
-    // Theme is a DOM token dependency.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, layer, criteria, theme])
-  useEffect(
-    () => () => {
-      texture?.dispose()
-    },
-    [texture],
-  )
+  const texture = useHazardTexture(data, layer, criteria, theme)
   const boundary = useMemo(() => (point && stats ? { point, radius: stats.projectedRadiusM } : null), [point, stats])
   useEffect(() => {
     onVisual({ texture, footprint: boundary, layer })
@@ -134,9 +83,9 @@ export default function HazardPanel({
         <>
           <p className="hint" data-testid="slope-method-warning">
             Slope screening uses our 3 × 3 OLS fitted plane, not NASA’s supplied slope raster. Estimator choice can change threshold
-            classifications: full-crop comparison differs by {data.meta.officialComparison.rmsDifferenceDeg.toFixed(3)}° RMS and up to{' '}
-            {data.meta.officialComparison.maxAbsDifferenceDeg.toFixed(3)}°. Agreement with a central-gradient reconstruction does not
-            establish the exact NASA method.
+            classifications: full-crop comparison for {siteName} differs by {data.meta.officialComparison.rmsDifferenceDeg.toFixed(3)}° RMS
+            and up to {data.meta.officialComparison.maxAbsDifferenceDeg.toFixed(3)}°. Agreement with a central-gradient reconstruction does
+            not establish the exact NASA method.
           </p>
           <div className="terrain-toolbar">
             <label className="field">

@@ -1,0 +1,130 @@
+import { useEffect, useMemo, useState } from 'react'
+import { type Criteria, type HazardData } from '../lib/hazardAnalysis'
+import { loadSiteLayers } from '../lib/terrainCache'
+import { footprintDetail, type FootprintDetail } from '../lib/terrainCompare'
+import { sampleGrid, type SurfacePoint, type TerrainAsset, type TerrainSiteInfo } from '../lib/terrainMesh'
+import { hazardAligned, useHazardTexture, type HazardSettings } from './hazardTexture'
+import TerrainCanvas, { type CameraLink } from './TerrainCanvas'
+
+export interface PaneResult {
+  siteId: string
+  detail: FootprintDetail | null
+}
+
+/** One side of the dual 3D comparison. Mount with `key={info.id}` so no value survives a site switch. */
+export default function TerrainComparePane({
+  slot,
+  info,
+  centre,
+  settings,
+  theme,
+  link,
+  linked,
+  onResult,
+}: {
+  slot: 'A' | 'B'
+  info: TerrainSiteInfo
+  /** planner site location used as the default footprint centre */
+  centre: { lat: number; lon: number }
+  settings: HazardSettings
+  theme: string
+  link: CameraLink
+  linked: boolean
+  onResult: (slot: 'A' | 'B', r: PaneResult | null) => void
+}) {
+  const [asset, setAsset] = useState<TerrainAsset | null>(null),
+    [hz, setHz] = useState<HazardData | null>(null),
+    [error, setError] = useState(''),
+    [attempt, setAttempt] = useState(0),
+    [picked, setPicked] = useState<SurfacePoint | null>(null)
+  useEffect(() => {
+    const abort = new AbortController()
+    loadSiteLayers(info.id)
+      .then(({ asset: a, hazards: h }) => {
+        if (abort.signal.aborted) return
+        if (!hazardAligned(h, a)) throw new Error('Scientific layer does not align with elevation source')
+        setAsset(a)
+        setHz(h)
+      })
+      .catch((e: Error) => {
+        if (!abort.signal.aborted) setError(e.message)
+      })
+    return () => abort.abort()
+  }, [info.id, attempt])
+  const siteElevation = asset ? sampleGrid(asset, centre.lat, centre.lon) : null
+  const site = useMemo(
+    () => (siteElevation === null ? null : { lat: centre.lat, lon: centre.lon, elevationM: siteElevation }),
+    [centre.lat, centre.lon, siteElevation],
+  )
+  const focus = picked ?? site
+  const criteria = useMemo<Criteria>(
+    () => ({ slope: settings.maxSlope, roughness: settings.maxRough }),
+    [settings.maxSlope, settings.maxRough],
+  )
+  const detail = useMemo(
+    () => (hz && asset && focus ? footprintDetail(hz, asset, focus, focus.elevationM, settings.radius, criteria) : null),
+    [hz, asset, focus, settings.radius, criteria],
+  )
+  useEffect(() => {
+    onResult(slot, hz && asset ? { siteId: info.id, detail } : null)
+  }, [slot, info.id, hz, asset, detail, onResult])
+  useEffect(() => () => onResult(slot, null), [slot, onResult])
+  const texture = useHazardTexture(hz, settings.layer, criteria, theme)
+  const visual = useMemo(
+    () => ({ texture, layer: settings.layer, footprint: focus && detail ? { point: focus, radius: detail.projectedRadiusM } : null }),
+    [texture, settings.layer, focus, detail],
+  )
+  return (
+    <section className="panel terrain-pane" aria-label={`Site ${slot} 3D view`} data-testid={`terrain-pane-${slot}`} data-site-id={info.id}>
+      <h3>
+        Site {slot}: {info.name}
+      </h3>
+      <p className="muted">
+        NASA PGDA {info.product}, 5 m native, 20 m mesh, {(info.extentM[0] / 1000).toFixed(0)} × {(info.extentM[1] / 1000).toFixed(0)} km
+        crop.
+      </p>
+      {error ? (
+        <div role="alert">
+          <p>{error}</p>
+          <button
+            className="btn"
+            onClick={() => {
+              setError('')
+              setAttempt((n) => n + 1)
+            }}
+          >
+            Retry Site {slot} terrain
+          </button>
+        </div>
+      ) : !asset || !hz ? (
+        <p role="status">Loading verified NASA terrain for Site {slot}…</p>
+      ) : site ? (
+        <>
+          <TerrainCanvas
+            asset={asset}
+            site={site}
+            selectedPoint={picked}
+            imagery={false}
+            theme={theme}
+            onPick={setPicked}
+            visual={visual}
+            link={link}
+            linked={linked}
+            label={`Site ${slot}`}
+          />
+          <p className="num" data-testid={`footprint-centre-${slot}`}>
+            Footprint centre: {focus!.lat.toFixed(5)}° latitude, {focus!.lon.toFixed(5)}° E, {focus!.elevationM.toFixed(1)} m elevation (
+            {picked ? 'picked point' : 'site location'}).
+          </p>
+          {picked && (
+            <button className="btn" onClick={() => setPicked(null)}>
+              Recentre Site {slot} footprint on the site location
+            </button>
+          )}
+        </>
+      ) : (
+        <p>The site location is outside this terrain crop. No terrain is extrapolated.</p>
+      )}
+    </section>
+  )
+}

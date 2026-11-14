@@ -8,6 +8,14 @@ import { sampleGrid } from '../lib/terrainMesh'
 import { cssVar } from '../lib/theme'
 
 type Action = 'reset' | 'in' | 'out' | 'rotate' | 'pan'
+/**
+ * Shared camera channel for side-by-side views. Members exchange the camera offset from its orbit target in
+ * local metres (X east, Y up, Z south), so both views keep the same physical scale and orientation around
+ * their own site. It never places the two terrains in one frame or implies they are adjacent.
+ */
+export interface CameraLink {
+  members: Map<symbol, (offset: [number, number, number]) => void>
+}
 export default function TerrainCanvas({
   asset,
   site,
@@ -16,6 +24,9 @@ export default function TerrainCanvas({
   theme,
   onPick,
   visual,
+  link,
+  linked = false,
+  label,
 }: {
   asset: TerrainAsset
   site: SurfacePoint
@@ -24,6 +35,11 @@ export default function TerrainCanvas({
   theme: string
   visual: HazardVisual | null
   onPick: (p: SurfacePoint) => void
+  link?: CameraLink
+  /** whether this view currently follows and drives the shared camera */
+  linked?: boolean
+  /** prefixes control names when several canvases share a page */
+  label?: string
 }) {
   const host = useRef<HTMLDivElement>(null),
     action = useRef<(a: Action) => void>(() => {}),
@@ -31,9 +47,11 @@ export default function TerrainCanvas({
   const updateVisual = useRef<(v: HazardVisual | null) => void>(() => {})
   const pick = useRef(onPick),
     [error, setError] = useState('')
+  const following = useRef(linked)
   useEffect(() => {
     pick.current = onPick
-  }, [onPick])
+    following.current = linked
+  }, [onPick, linked])
   useEffect(() => {
     const container = host.current!,
       arrays = meshArrays(asset)
@@ -94,7 +112,13 @@ export default function TerrainCanvas({
     const boundaryLine = new THREE.LineSegments(boundaryGeometry, boundaryMaterial)
     boundaryLine.renderOrder = 10
     scene.add(boundaryLine)
+    const me = Symbol('terrain-view')
+    let applying = false
     const render = () => {
+      if (link && following.current && !applying) {
+        const o = camera.position.clone().sub(controls.target).toArray() as [number, number, number]
+        for (const [id, apply] of link.members) if (id !== me) apply(o)
+      }
       canvas.dataset.camera = JSON.stringify([...camera.position.toArray(), ...controls.target.toArray()])
       renderer.render(scene, camera)
     }
@@ -140,6 +164,14 @@ export default function TerrainCanvas({
     }
     reset()
     controls.addEventListener('change', render)
+    link?.members.set(me, (o) => {
+      if (!following.current) return
+      applying = true
+      camera.position.copy(controls.target).add(new THREE.Vector3(...o))
+      controls.update()
+      render()
+      applying = false
+    })
     let disposed = false,
       texture: THREE.Texture | null = null
     if (imagery && asset.imageUrl)
@@ -216,6 +248,7 @@ export default function TerrainCanvas({
     canvas.addEventListener('webglcontextlost', lost)
     render()
     return () => {
+      link?.members.delete(me)
       updateVisual.current = () => {}
       overlayMaterial.dispose()
       boundaryGeometry.dispose()
@@ -237,7 +270,7 @@ export default function TerrainCanvas({
       renderer.dispose()
       canvas.remove()
     }
-  }, [asset, site, theme, imagery])
+  }, [asset, site, theme, imagery, link])
   useEffect(() => {
     select.current(selectedPoint)
   }, [asset, site, theme, imagery, selectedPoint])
@@ -255,13 +288,19 @@ export default function TerrainCanvas({
             ['rotate', 'Rotate right'],
             ['pan', 'Pan right'],
           ] as const
-        ).map(([a, label]) => (
-          <button type="button" className="btn" key={a} onClick={() => action.current(a)}>
-            {label}
+        ).map(([a, text]) => (
+          <button
+            type="button"
+            className="btn"
+            key={a}
+            aria-label={label ? `${label}: ${text}` : undefined}
+            onClick={() => action.current(a)}
+          >
+            {text}
           </button>
         ))}
       </div>
-      <div className="terrain-canvas" ref={host} />
+      <div className="terrain-canvas" ref={host} data-view={label} />
       {error && <p role="alert">{error}</p>}
     </>
   )

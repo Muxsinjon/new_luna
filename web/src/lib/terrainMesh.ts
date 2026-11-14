@@ -15,6 +15,12 @@ interface AssetFile {
 }
 export interface TerrainMeta {
   version: number
+  /** present for sites built by the generalised Milestone 3 pipeline */
+  siteId?: string
+  name?: string
+  product?: string
+  plannerId?: string
+  centreSource?: string
   width: number
   height: number
   x0: number
@@ -39,7 +45,39 @@ export interface TerrainAsset {
   imageUrl: string | null
 }
 const R = 1737400
-export const terrainBase = `${import.meta.env.BASE_URL}data/terrain/site01/`
+export const terrainRoot = `${import.meta.env.BASE_URL}data/terrain/`
+/** Asset directory of one processed site (Milestone 1 used Site01 only). */
+export const terrainBase = (siteId = 'site01') => `${terrainRoot}${siteId}/`
+
+/** One entry of web/public/data/terrain/index.json, written by pipeline/terrain_sites.py. */
+export interface TerrainSiteInfo {
+  id: string
+  name: string
+  product: string
+  readmeName: string
+  plannerId: string
+  centre: { lat: number; lon: number }
+  centreSource: string
+  extentM: [number, number]
+  meshSpacingM: number
+  nativeSpacingM: number
+  sourceUrl: string
+  sourceSha256: string
+}
+export interface TerrainIndex {
+  version: number
+  product: string
+  citation: string
+  method: string
+  sites: TerrainSiteInfo[]
+}
+export async function loadTerrainIndex(signal?: AbortSignal): Promise<TerrainIndex> {
+  const r = await fetch(terrainRoot + 'index.json', { signal })
+  if (!r.ok) throw new Error(`Could not load the processed terrain site list (HTTP ${r.status})`)
+  const index: TerrainIndex = await r.json()
+  if (index.version !== 1 || !Array.isArray(index.sites) || !index.sites.length) throw new Error('Unsupported terrain site list')
+  return index
+}
 
 export function validateTerrain(asset: TerrainAsset) {
   const { meta: m, heights, errors } = asset
@@ -121,8 +159,8 @@ export function meshArrays(asset: TerrainAsset) {
   if (!indices.length) throw new Error('No valid terrain triangles')
   return { origin, positions, uv, indices: new Uint32Array(indices) }
 }
-async function checkedFile(file: { file: string; sha256: string }, signal?: AbortSignal) {
-  const r = await fetch(terrainBase + file.file, { signal })
+async function checkedFile(base: string, file: { file: string; sha256: string }, signal?: AbortSignal) {
+  const r = await fetch(base + file.file, { signal })
   if (!r.ok) throw new Error(`Could not load terrain ${file.file} (HTTP ${r.status})`)
   const bytes = await r.arrayBuffer(),
     hash = await crypto.subtle.digest('SHA-256', bytes)
@@ -137,17 +175,37 @@ function decode(bytes: ArrayBuffer) {
   for (let i = 0; i < out.length; i++) out[i] = view.getFloat32(i * 4, true)
   return out
 }
-export async function loadTerrainAsset(signal?: AbortSignal): Promise<TerrainAsset> {
-  const r = await fetch(terrainBase + 'terrain.json', { signal })
+export async function loadTerrainAsset(signal?: AbortSignal, siteId = 'site01'): Promise<TerrainAsset> {
+  const base = terrainBase(siteId)
+  const r = await fetch(base + 'terrain.json', { signal })
   if (!r.ok) throw new Error(`Could not load terrain metadata (HTTP ${r.status})`)
   const meta: TerrainMeta = await r.json()
   const [h, e, image] = await Promise.all([
-    checkedFile(meta.assets.surf, signal),
-    checkedFile(meta.assets.toterr, signal),
-    meta.imagery ? checkedFile(meta.imagery, signal) : null,
+    checkedFile(base, meta.assets.surf, signal),
+    checkedFile(base, meta.assets.toterr, signal),
+    meta.imagery ? checkedFile(base, meta.imagery, signal) : null,
   ])
   const asset = { meta, heights: decode(h), errors: decode(e), imageUrl: null as string | null }
   validateTerrain(asset)
+  if (meta.siteId !== undefined && meta.siteId !== siteId) throw new Error('Terrain asset belongs to a different site')
   if (image) asset.imageUrl = URL.createObjectURL(new Blob([image], { type: 'image/jpeg' }))
   return asset
+}
+
+/**
+ * The processed terrain site whose crop contains (lat, lon): the planner site linked by `plannerId` first,
+ * otherwise the first crop whose map-plane extent (centre ± extent/2) contains the point. Null = no terrain;
+ * nothing is extrapolated outside a crop.
+ */
+export function terrainSiteFor(sites: TerrainSiteInfo[], plannerId: string, lat: number, lon: number): TerrainSiteInfo | null {
+  const linked = sites.find((t) => t.plannerId === plannerId)
+  if (linked) return linked
+  if (![lat, lon].every(Number.isFinite) || lat > -60) return null
+  const p = polarXY(lat, lon)
+  return (
+    sites.find((t) => {
+      const c = polarXY(t.centre.lat, t.centre.lon)
+      return Math.abs(p.x - c.x) <= t.extentM[0] / 2 && Math.abs(p.y - c.y) <= t.extentM[1] / 2
+    }) ?? null
+  )
 }

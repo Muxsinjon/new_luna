@@ -72,6 +72,8 @@ with sync_playwright() as pw:
  page.unroute('**/terrain/site01/terrain.json',corrupt);page.get_by_role('button',name='Retry terrain loading').click();expect(canvas).to_be_visible(timeout=20000)
  page.get_by_label('Terrain appearance').select_option('imagery')
  expect(canvas).to_have_attribute('data-appearance','imagery',timeout=15000)
+ # let the 5 m analysis layers finish downloading so the reload does not abort in-flight requests
+ expect(page.get_by_test_id('slope-method-warning')).to_be_visible(timeout=30000)
  page.reload()
  expect(page.get_by_label('Terrain appearance')).to_have_value('elevation')
  expect(canvas).to_have_attribute('data-appearance','elevation',timeout=20000)

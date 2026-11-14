@@ -1,8 +1,18 @@
 # LunaWindow project status
 
-Updated 2026-11-14. Local branch: `feat/site01-hazard-analysis`, based on preserved `aeb54a6`. No GitHub push, remote PR, publication or merge. Milestone 2 completed locally; Milestone 3 has not started.
+Updated 2026-11-15. Branch `milestone-3` on `Muxsinjon/new_luna`, based on `0eabd44`. Milestone 3 is complete and pushed; Milestones 4–9 have not started.
 
-## Milestone 2 — completed locally
+## Milestone 3: completed
+
+- **Sites:** Site01 (Connecting Ridge), Site04 (Shackleton Rim) and Site06 (Nobile Rim 1) are processed by one generalised pipeline (`pipeline/terrain_sites.py`). The Site01 rebuild is byte-identical to Milestones 1 and 2.
+- **UI:** a "Compare A and B" mode with two 3D views, linked cameras, shared thresholds, an equal-footprint comparison table, trade-off text and navigation that keeps sites and dates.
+- **Planner catalogue:** two new entries at the DEM centre pixels; the other 17 sites are unchanged.
+- **Tests:** 81 JS, 19 Python, plus the new dual-view e2e and the legacy terrain, hazard and smoke suites, all passing.
+- **Default result:** both DEM-centre footprints fail the illustrative 10° / 0.3 m / 90 % screen, and the UI says so.
+
+See [Milestone 3 acceptance](MILESTONE3_ACCEPTANCE.md).
+
+## Milestone 2: completed (preserved)
 
 The existing 3D explorer now has native-resolution source-derived slope, roughness and configurable hazard overlays, point measurements, thresholds and circular footprint statistics. Geometry and camera are preserved across analysis layer changes. No remote updates, PRs or deployment were performed.
 

@@ -111,3 +111,13 @@ Final verification fixed the baseline Google Fonts proxy certificate failure by 
 The existing mesh now supports Elevation, Slope, Roughness and Hazard Assessment. Analysis comes from the native 5 m DEM before display decimation: 3×3 OLS plane slope (15 m nominal support), 5×5 detrended height RMS (25 m support). Georeferenced 5 m fields, thresholds and circular-footprint sample summaries are independent of the 20 m rendering geometry. Layer switching preserves the camera; boundary segments are visually raised 3 m only for readability. WAC remains optional, registration unverified and off by default; analysis colors override imagery while a scientific layer is selected.
 
 See [MILESTONE2_ACCEPTANCE.md](MILESTONE2_ACCEPTANCE.md) for equations, official-slope comparison, quantitative checks and browser instructions, and [DATA_SOURCES.md](DATA_SOURCES.md) for source status. Processing: `python pipeline/hazard_site01.py` after installing the pinned terrain requirements. Do not interpret DEM-derived roughness as independently resolved obstacles or convert height RMS into a derived metric confidence interval. No M1 scientific datasets or ephemeris functions were replaced.
+
+## Milestone 3: multiple sites and side-by-side comparison
+
+- Assets live in `web/public/data/terrain/<siteId>/` (`site01`, `site04`, `site06`), listed in `terrain/index.json`.
+- `loadTerrainAsset(signal, siteId)` and `loadHazards(signal, siteId)` reject metadata belonging to another site.
+- The "Compare A and B" mode renders two `TerrainCanvas` views. They share a `CameraLink` (the camera offset in local metres) and a single set of criteria.
+- `lib/terrainCompare.ts` computes the equal-footprint statistics and the three-state screen. These are pure, tested functions.
+- Rebuild: `python pipeline/terrain_sites.py site04 site06 && python pipeline/terrain_sites.py --index`.
+
+See [MILESTONE3_ACCEPTANCE.md](MILESTONE3_ACCEPTANCE.md).
