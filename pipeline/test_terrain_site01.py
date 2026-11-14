@@ -42,6 +42,17 @@ class TerrainTests(unittest.TestCase):
         self.assertEqual(p['matrix'],8)
         self.assertGreater(len(p['tiles']),0)
 
+    def test_fractional_reference_fixture_against_original_geotiff(self):
+        from verify_site01_acceptance import SourceReference, ROOT
+        fixture=json.loads((ROOT/'docs/data/SITE01_SAMPLE_REFERENCE.json').read_text())
+        reference=SourceReference()
+        self.assertEqual(fixture['sourceSha256'],self.meta['sources']['surf']['sha256'])
+        self.assertEqual(len(fixture['points']),101)
+        for point in fixture['points']:
+            actual=reference.at(point['lat'],point['lon'])
+            for field in ['native5mBilinearM','mesh20mBilinearM','mesh20mTriangleM']:
+                self.assertAlmostEqual(actual[field],point[field],places=7)
+
     def test_full_native_subset_identity(self):
         path=RAW/self.meta['sources']['surf']['file']
         if not path.exists(): self.skipTest('Download real NASA sources with terrain_site01.py first')

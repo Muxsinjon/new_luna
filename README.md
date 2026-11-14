@@ -148,7 +148,7 @@ TypeScript (strict), React 19 API (Preact runtime in production builds), hand-wr
 - The National, 5 Sep 2023, "India's Chandrayaan-3 mission lander and rover in sleep mode for lunar night".
 - India TV News, 21 Sep 2023, on the 22 Sep wake-up attempt.
 
-**Software** (all open source): React, Preact, Vite, Vitest, TypeScript, ESLint, Prettier, Playwright, NumPy, rasterio, pyproj, requests. **Fonts:** Barlow and Barlow Semi Condensed (Jeremy Tribby, SIL OFL), via Google Fonts.
+**Software** (all open source): React, Preact, Vite, Vitest, TypeScript, ESLint, Prettier, Playwright, NumPy, rasterio, pyproj, requests. **Fonts:** Barlow and Barlow Semi Condensed (Jeremy Tribby, SIL OFL), self-hosted from Google Fonts; source hashes and licenses are in `web/public/fonts/`.
 **Images:** all original. The favicon and OG image are hand-coded SVG drawn from our own LOLA horizon data. No NASA logos or insignia are used, and no AI-generated images.
 
 ## Use of AI
@@ -162,6 +162,8 @@ MIT for the code ([LICENSE](LICENSE)). The NASA data is public domain; please ci
 
 ## 3D lunar terrain explorer
 
-The **3D Terrain** workspace provides a real Three.js terrain mesh from NASA PGDA's Connecting Ridge **Site01 5 m LOLA DEM**, with rotation, zoom, pan, surface-point selection and lunar coordinate/elevation/RMS readouts linked to Site A/B. The browser uses a documented 20 m mesh over 8 × 8 km. Optional real LROC WAC imagery is projected onto that terrain as coarse context; independent landmark co-registration has not been measured.
+The **3D Terrain** workspace provides a real Three.js terrain mesh from NASA PGDA's Connecting Ridge **Site01 5 m LOLA DEM**, with rotation, zoom, pan, surface-point selection and lunar coordinate/elevation/RMS readouts linked to Site A/B. The browser uses a documented 20 m mesh over 8 × 8 km. Optional real LROC WAC imagery is projected onto that terrain as coarse context; independent landmark co-registration is unverified and the texture is off by default.
 
 Existing mission planning, comparisons, astronomical calculations and 360° Surface View are preserved. See [project status](docs/PROJECT_STATUS.md) and [verified sources, processing and tests](docs/TERRAIN_3D.md) for source uncertainty, decimation error, image limitations and local review commands.
+
+Final Milestone 1 results: [acceptance report](docs/MILESTONE1_ACCEPTANCE.md).

@@ -54,6 +54,8 @@ Decimation adds error relative to the native DEM. Across 2,563,201 native sample
 
 ## Real LROC imagery
 
+The texture is **off by default and explicitly labeled registration unverified**. Map-coordinate reprojection checks do not establish independent image/DEM registration accuracy. See [final acceptance](MILESTONE1_ACCEPTANCE.md).
+
 The optional texture uses NASA Moon Trek's **LRO_WAC_Mosaic_Global_303ppd_v02**, a real preliminary LROC WAC global mosaic assembled from over 15,000 images acquired November 2009–February 2011. It is coarser context imagery, **not NAC**. The polar subset is dark; shaded elevation remains the default.
 
 - [Official WMTS capabilities](https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/WMTSCapabilities.xml)
@@ -90,7 +92,7 @@ python tests/e2e/terrain_test.py http://127.0.0.1:4173/ --executable /usr/bin/ch
 
 Use a Python with Playwright installed for browser tests, and either the managed Chromium or the explicit system executable. TLS checks stay enabled using the system CA bundle. HTTP failures are not retried repeatedly. Cached inputs are reused; repeated processing produced identical elevation, uncertainty and JPEG hashes. Running without `--imagery` generates only elevation/uncertainty and intentionally omits the optional texture from the manifest.
 
-The Python tests explicitly skip the full-native-source comparison if raw files have not been downloaded; asset hashes, coordinate checkpoints and texture bounds still run. All five tests executed with no skips in this development environment.
+The Python tests explicitly skip the full-native-source comparison if raw files have not been downloaded; asset hashes, coordinate checkpoints and texture bounds still run. All six Python tests, including the independent fractional reference test, executed with no skips in final verification.
 
 The 3D browser test checks rendered pixel changes after camera operations, pointer picking versus dragging, coordinate and RMS readouts, the actual decoded LROC texture, Site A/B planner integration, coverage limits, mobile overflow and checksum-failure/retry recovery. Screenshots go to ignored `pipeline/out/terrain-screenshots/`. Software-renderer `ReadPixels` performance warnings caused by screenshot capture are reported separately; unexpected application errors and local asset failures remain fatal.
 
@@ -102,4 +104,4 @@ The planner's custom-site elevation and 250 km horizon remain derived from its e
 
 Resources and event handlers are disposed when the workspace closes. Rendering occurs on interaction/resize rather than continuously. The Three.js module is lazy-loaded (~144 kB gzip); Vite reports a >500 kB uncompressed chunk advisory. WebGL 2 is required; failures show a readable message and other workspaces remain usable.
 
-The unchanged full browser smoke suite still encounters the baseline Google Fonts proxy certificate error in this environment. It passes its ten functional checks but fails its zero-console gate. Certificate verification was not disabled or persistent browser trust changed.
+Final verification fixed the baseline Google Fonts proxy certificate failure by self-hosting the same licensed Barlow faces. The unchanged full smoke suite now passes all ten workflows with no console errors or warnings. See `web/public/fonts/SOURCES.md` for sources, hashes and OFL licenses. Certificate verification was not disabled and persistent browser trust was not changed. The terrain browser suite now requires Rasterio/PyProj and the original GeoTIFF to independently verify selected points; it asserts all four local font faces load and zero external HTTP requests occur. Run `python pipeline/verify_site01_acceptance.py` to regenerate the 101-point native-source reference.

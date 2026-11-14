@@ -74,4 +74,13 @@ describe('real NASA Site01 terrain', () => {
     const s = { ...DEFAULT_STATE, ws: 'terrain' as const, surfaceSite: 'B' as const }
     expect(fromHash(toHash(s))).toEqual(s)
   })
+  it('matches independent native GeoTIFF reference samples at fractional lunar coordinates', () => {
+    const reference = JSON.parse(readFileSync(new URL('../../../docs/data/SITE01_SAMPLE_REFERENCE.json', import.meta.url), 'utf8'))
+    expect(reference.sourceSha256).toBe(meta.sources.surf.sha256)
+    expect(reference.points).toHaveLength(101)
+    for (const p of reference.points) {
+      expect(sampleGrid(asset, p.lat, p.lon)).toBeCloseTo(p.mesh20mBilinearM, 5)
+      expect(Math.abs(sampleGrid(asset, p.lat, p.lon)! - p.native5mBilinearM)).toBeLessThan(meta.decimationResidualM.maxAbs + 0.02)
+    }
+  })
 })

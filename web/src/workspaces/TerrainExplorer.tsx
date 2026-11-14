@@ -108,6 +108,12 @@ export default function TerrainExplorer() {
             <p className="muted">
               {st.name}. About 90% of native pixels are interpolated between laser returns. Pixel spacing is not measurement accuracy.
             </p>
+            {asset.meta.imagery && (
+              <p className="hint" data-testid="registration-warning">
+                LROC WAC registration is unverified. The texture is off by default and available only as optional context; geographic
+                reprojection does not establish landmark alignment accuracy.
+              </p>
+            )}
             <div className="terrain-toolbar">
               <label className="field">
                 <span>Terrain appearance</span>
@@ -117,7 +123,7 @@ export default function TerrainExplorer() {
                   onChange={(e) => setImagery(e.target.value === 'imagery')}
                 >
                   <option value="elevation">Shaded elevation</option>
-                  {asset.meta.imagery && <option value="imagery">Real LROC WAC imagery (context)</option>}
+                  {asset.meta.imagery && <option value="imagery">LROC WAC — registration unverified</option>}
                 </select>
               </label>
             </div>
@@ -150,7 +156,14 @@ export default function TerrainExplorer() {
             {imagery && <p className="hint">{asset.meta.imagery?.note}</p>}
             <section className="panel">
               <h3>Selected surface point</h3>
-              <p className="num" aria-live="polite" data-testid="terrain-readout">
+              <p
+                className="num"
+                aria-live="polite"
+                data-testid="terrain-readout"
+                data-lat={picked?.lat}
+                data-lon={picked?.lon}
+                data-elevation-m={picked?.elevationM}
+              >
                 {picked
                   ? `${picked.lat.toFixed(5)}° latitude, ${picked.lon.toFixed(5)}° E, ${picked.elevationM.toFixed(1)} m elevation`
                   : 'Click terrain or enter lunar coordinates to inspect elevation.'}
@@ -221,8 +234,9 @@ export default function TerrainExplorer() {
                   <a href={asset.meta.imagery.url} target="_blank" rel="noreferrer">
                     {asset.meta.imagery.title}
                   </a>
-                  . Geographic projection alignment is verified. No independent landmark residual or subpixel image/DEM co-registration has
-                  been established. WAC is coarse context imagery, not high-resolution NAC.
+                  . Map-coordinate reprojection is checked, but image-to-terrain registration is unverified. No independent landmark
+                  residual or subpixel image/DEM co-registration has been established. WAC is coarse context imagery, not high-resolution
+                  NAC.
                 </p>
               )}
             </details>
