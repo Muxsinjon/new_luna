@@ -2,6 +2,13 @@
 
 Updated 2026-11-14. Reference directory: user-supplied `Lunar_Landing_Navigator_NASA_JPL_Data_Sources.docx` (17 categories). That document is a discovery directory, not verification. Status below distinguishes existing integration, newly verified products and future/uninspected collections. No remote publication is implied.
 
+## Milestone 4 astronomy records
+
+| Record | Request | Use |
+|---|---|---|
+| JPL Horizons ephemeris (verified existing) | target 301, center 500@399, quantities 14,15,19,20, hourly 2023-01-01 to 2031-12-31 23:00 UT, DE441 | sub-Earth and sub-solar points in MOON_ME. Shipped every 6 h (coverage ends at the last shipped row, 2031-12-31 18:00 UTC) and upsampled with a cubic in the browser |
+| JPL Horizons topocentric reference (new) | 18 requests: targets 10 and 399, CENTER coord@301, GEODETIC sites, TLIST of 40 UT epochs, quantities 4,13 (+10,20 for Earth), EXTRA_PREC | independent validation only (`web/src/lib/__fixtures__/horizons_topocentric.json`, `docs/data/MILESTONE4_ASTRONOMY_VALIDATION.json`) |
+
 ## Milestone 3 multi-site records
 
 | Record | Product / file | Use | Notes |

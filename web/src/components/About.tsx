@@ -207,7 +207,10 @@ export default function About({ data }: { data: AppData }) {
           boulders are not resolved, so the horizon can be off by a few tenths of a degree. Near the pole that shifts sunrise or sunset by
           roughly 1–3 hours.
         </li>
-        <li>The ephemeris covers 2023–2031 at 1-hour steps. Interpolation error is below 0.01°.</li>
+        <li>
+          The ephemeris covers 2023-01-01 00:00 to 2031-12-31 18:00 UTC at 1-hour steps (the last shipped 6-hourly row). Times outside are
+          never extrapolated. Sun directions agree with JPL Horizons within 0.001° and Earth directions within 0.006°.
+        </li>
         <li>Coordinates marked “Needs verification” still need a primary-source check.</li>
       </ul>
       <p className="muted">The full tables are in the repository at {LINKS.repoValidation}.</p>

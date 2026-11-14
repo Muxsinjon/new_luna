@@ -5,6 +5,8 @@ import { footprintDetail, type FootprintDetail } from '../lib/terrainCompare'
 import { sampleGrid, type SurfacePoint, type TerrainAsset, type TerrainSiteInfo } from '../lib/terrainMesh'
 import { hazardAligned, useHazardTexture, type HazardSettings } from './hazardTexture'
 import TerrainCanvas, { type CameraLink } from './TerrainCanvas'
+import { bodyVectorsFromSite } from '../lib/analysis'
+import { useStore } from '../lib/store'
 
 export interface PaneResult {
   siteId: string
@@ -55,6 +57,11 @@ export default function TerrainComparePane({
   const site = useMemo(
     () => (siteElevation === null ? null : { lat: centre.lat, lon: centre.lon, elevationM: siteElevation }),
     [centre.lat, centre.lon, siteElevation],
+  )
+  const { s, data } = useStore()
+  const bodies = useMemo(
+    () => (site ? bodyVectorsFromSite(data.eph, s.selectedTime, site.lat, site.lon, site.elevationM) : null),
+    [site, data, s.selectedTime],
   )
   const focus = picked ?? site
   const criteria = useMemo<Criteria>(
@@ -110,6 +117,7 @@ export default function TerrainComparePane({
             visual={visual}
             link={link}
             linked={linked}
+            bodies={bodies}
             label={`Site ${slot}`}
           />
           <p className="num" data-testid={`footprint-centre-${slot}`}>

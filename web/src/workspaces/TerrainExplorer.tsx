@@ -2,6 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { DEFAULT_HAZARD_SETTINGS, type HazardSettings } from '../components/hazardTexture'
 import HazardPanel, { type HazardVisual } from '../components/HazardPanel'
 import SitePair from '../components/SitePair'
+import SkyReadout from '../components/SkyReadout'
+import TimeBar from '../components/TimeBar'
+import { bodyVectorsFromSite } from '../lib/analysis'
 import TerrainCanvas, { type CameraLink } from '../components/TerrainCanvas'
 import TerrainComparePane, { type PaneResult } from '../components/TerrainComparePane'
 import TerrainComparison from '../components/TerrainComparison'
@@ -17,7 +20,7 @@ import {
 } from '../lib/terrainMesh'
 
 export default function TerrainExplorer() {
-  const { s, set, site, addCustom, customBusy, theme } = useStore()
+  const { s, set, site, addCustom, customBusy, theme, data } = useStore()
   const [asset, setAsset] = useState<TerrainAsset | null>(null),
     [error, setError] = useState(''),
     [attempt, setAttempt] = useState(0)
@@ -90,6 +93,10 @@ export default function TerrainExplorer() {
     () => (elevation === null ? null : { lat: st.lat, lon: st.lon, elevationM: elevation }),
     [st.lat, st.lon, elevation],
   )
+  const bodies = useMemo(
+    () => (current ? bodyVectorsFromSite(data.eph, s.selectedTime, current.lat, current.lon, current.elevationM) : null),
+    [current, data, s.selectedTime],
+  )
   const pick = (p: SurfacePoint) => {
     setPicked(p)
     setLat(p.lat.toFixed(5))
@@ -156,6 +163,7 @@ export default function TerrainExplorer() {
             </div>
           )}
         </div>
+        <TimeBar />
         {index && (
           <div className="terrain-toolbar">
             {(['A', 'B'] as const).map((slot) => {
@@ -290,6 +298,7 @@ export default function TerrainExplorer() {
                 theme={theme}
                 onPick={pick}
                 visual={visual}
+                bodies={bodies}
               />
             ) : (
               <div className="panel">
@@ -302,6 +311,7 @@ export default function TerrainExplorer() {
                 </button>
               </div>
             )}
+            {current && <SkyReadout site={st} slot={s.surfaceSite} />}
             <p className="hint">
               Drag to rotate, scroll or pinch to zoom, right drag or two fingers to pan. Focus the canvas and use arrow keys to pan, or use
               the camera buttons. Click terrain to select a point. Magenta marks the mission site; cyan marks your picked point. Local axes:

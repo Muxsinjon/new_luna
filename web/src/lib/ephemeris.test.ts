@@ -20,6 +20,16 @@ describe('ephemeris upsampling', () => {
     const q = (Math.atan2(out[10], out[9]) * 180) / Math.PI
     expect(Math.abs(q - 0.5)).toBeLessThan(0.0005)
   })
+  it('is exact for cubic motion between interior samples (Catmull-Rom on uniform knots)', () => {
+    // Earth x follows a quadratic in time: Catmull-Rom reproduces quadratics exactly; linear would not
+    const f = (h: number) => 384000 + 2 * h * h
+    const rows = new Float32Array(4 * 6)
+    for (let i = 0; i < 4; i++) rows.set([f(6 * i), 0, 0, 1, 0, 0], i * 6)
+    const out = upsampleEphemeris(rows, 6)
+    for (let h = 6; h <= 12; h++) expect(out[h * 6]).toBeCloseTo(f(h), 1)
+    expect(Math.abs(out[9 * 6] - f(9))).toBeLessThan(0.1)
+    expect(Math.abs((f(6) + f(12)) / 2 - f(9))).toBeGreaterThan(10) // what linear interpolation would miss
+  })
   it('validates input', () => {
     expect(() => upsampleEphemeris(new Float32Array(7), 4)).toThrow()
     expect(() => upsampleEphemeris(new Float32Array(6), 0)).toThrow()

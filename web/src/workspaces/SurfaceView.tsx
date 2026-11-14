@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { type Sample, SUN_RADIUS_DEG, makeCtx, sampleAt, vectorsAt } from '../lib/analysis'
 import { fmtAz, fmtDeg, fmtPct, fmtTime } from '../lib/format'
 import { horizonAt } from '../lib/geometry'
+import { earthPhase } from '../lib/physics/earthPhase'
 import { useStore } from '../lib/store'
 import { MODEL_LABEL, signal } from '../lib/visibility'
 import { reason } from '../lib/explain'
@@ -44,14 +45,11 @@ export default function SurfaceView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [st, view, fov, W, H, ex, data])
 
-  // Earth phase as seen from the Moon: lit fraction from the Sun-Earth elongation
-  const earthPhase = useMemo(() => {
+  // Earth phase as seen from this site (pure function, validated against JPL Horizons Illu%)
+  const earthPhaseNow = useMemo(() => {
     const { earth, sun } = vectorsAt(data.eph, s.selectedTime)
-    const ev = [earth[0] - ctx.pos[0], earth[1] - ctx.pos[1], earth[2] - ctx.pos[2]]
-    const n = Math.sqrt(ev[0] * ev[0] + ev[1] * ev[1] + ev[2] * ev[2])
-    const cosE = (ev[0] * sun[0] + ev[1] * sun[1] + ev[2] * sun[2]) / n // elongation of the Sun from Earth
-    const phaseAngle = Math.PI - Math.acos(Math.max(-1, Math.min(1, cosE)))
-    return { phaseAngle, lit: (1 + Math.cos(phaseAngle)) / 2 }
+    const fromSite: [number, number, number] = [earth[0] - ctx.pos[0], earth[1] - ctx.pos[1], earth[2] - ctx.pos[2]]
+    return earthPhase(fromSite, sun, earth, data.eph.meta.meanSunDistanceKm)
   }, [data, s.selectedTime, ctx])
 
   const sunR = Math.max(4, SUN_RADIUS_DEG * pxPerDeg)
@@ -64,8 +62,8 @@ export default function SurfaceView() {
   const ey = Y(now.earthEl)
   const toSun = Math.atan2(sy - ey, sx - exx) // screen direction from Earth towards the Sun
   const r = earthR
-  const rx = r * Math.abs(Math.cos(earthPhase.phaseAngle))
-  const gibbous = earthPhase.phaseAngle < Math.PI / 2
+  const rx = r * Math.abs(Math.cos(earthPhaseNow.phaseAngle))
+  const gibbous = earthPhaseNow.phaseAngle < Math.PI / 2
   const litPath = `M0,${-r} A${r},${r} 0 0 1 0,${r} A${rx},${r} 0 0 ${gibbous ? 1 : 0} 0,${-r}Z`
 
   const look = (az: number, el: number) => setView({ az, el: Math.max(-10, Math.min(60, el)) })
@@ -261,7 +259,9 @@ export default function SurfaceView() {
             </div>
             <p className="num">
               Azimuth {fmtAz(now.earthAz)}, elevation {fmtDeg(now.earthEl)}
-              {terrainMode && `, terrain ${fmtDeg(now.earthHorizon)}`}, {fmtPct(earthPhase.lit * 100)} of Earth’s disc sunlit
+              {terrainMode && `, terrain ${fmtDeg(now.earthHorizon)}`}, {fmtPct(earthPhaseNow.illuminated * 100)} of Earth’s disc sunlit
+              (phase angle {fmtDeg((earthPhaseNow.phaseAngle * 180) / Math.PI)}), apparent diameter {(2 * now.earthRadiusDeg).toFixed(2)}°,
+              distance {Math.round(now.earthDistKm).toLocaleString('en')} km
             </p>
             <p className="reason">{reason(now, 'earth', s.vis)}</p>
           </section>

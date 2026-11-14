@@ -243,3 +243,14 @@ export function hourly(ctx: SiteCtx, eph: Ephemeris, model: VisModel = 'terrain'
   hourlyCache.set(key, h)
   return h
 }
+
+/**
+ * Milestone 4: Sun direction (unit) and site → Earth vector (km), both MOON_ME, for a surface point at height
+ * `elevationM` above the 1737.4 km sphere. Used for 3D rays; the charts use the same vectors via evalVectors.
+ */
+export function bodyVectorsFromSite(eph: Ephemeris, t: number, lat: number, lon: number, elevationM: number): { sun: Vec3; earth: Vec3 } {
+  const { earth, sun } = vectorsAt(eph, t)
+  const u = unitVec(lon, lat)
+  const r = R_MOON_KM + elevationM / 1000
+  return { sun, earth: [earth[0] - u[0] * r, earth[1] - u[1] * r, earth[2] - u[2] * r] }
+}

@@ -24,6 +24,18 @@ The web app ships the ephemeris at 6-hour steps and interpolates it back to hour
 
 A wider sweep (2026-11-01 to 2026-12-01 every 6h, 5 sites) gives a worst elevation error of **0.0057°** (`pipeline/validate_ephemeris.py`).
 
+## 1b. Milestone 4 extended check (azimuth, elevation, Earth phase and size)
+
+`pipeline/validate_astronomy.py` compares the browser path against Horizons topocentric output for 9 sites (including the pole, the north polar region, the far side, both longitude conventions and the prime-meridian wrap) and 40 UT epochs (coverage edges, a UTC date change, a leap day and 28 random times). Over the 342 in-coverage samples:
+
+- Sun elevation is within 0.0009° and Sun azimuth within 0.0003° on-sky.
+- Earth elevation and azimuth are within 0.0059°.
+- Earth's apparent diameter is within 0.0026°, and its illuminated fraction within 0.006 percentage points.
+
+Details are in [MILESTONE4_ACCEPTANCE.md](MILESTONE4_ACCEPTANCE.md).
+
+The shipped ephemeris ends at 2031-12-31 18:00 UTC (its last 6-hourly row). Later times return no values.
+
 ## 2. Terrain-aware visibility vs NASA LOLA illumination maps
 
 Reference: LOLA average visibility maps, Mazarico et al. (2011) Icarus 211, PGDA 75S 120 m (2016). ours: 2023-2031 hourly, 240 m horizon masks, 2 m observer; PGDA: 18.6-yr average at 120 m.
@@ -50,7 +62,7 @@ Sources: ISRO mission updates (Sep 2023); The National, 2023-09-05, "India's Cha
 
 ## Known uncertainty
 
-- Ephemeris interpolation: < 0.01° (table above).
+- Ephemeris interpolation (cubic, Milestone 4): Earth direction max 0.0014°, Sun max 0.0003° against the full hourly Horizons series.
 - Terrain: 240 m polar grid (960 m and about 7.6 km for custom points). Near-field slopes and boulders are not resolved, so the horizon can be wrong by tenths of a degree near the site. At the pole, the Sun climbs about 0.1–0.5° per hour, so a 0.3° horizon error shifts sunrise or sunset by roughly 1–3 h.
 - Coordinates: curated sites are cited; sites flagged `verify` still need a primary-source check.
 - Power: a simple 30 % sun-tracking vertical panel; no thermal, dust or degradation model.

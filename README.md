@@ -176,10 +176,14 @@ Within **3D Terrain**, select a location and use **Scientific terrain analysis**
 
 In **3D Terrain**, choose **Compare A and B** to see two NASA LOLA 5 m sites side by side: Connecting Ridge (Site01), Shackleton Rim (Site04) and Nobile Rim 1 (Site06). The views can be linked so they share scale and viewing direction. One set of slope, roughness and footprint criteria applies to both, and an equal-footprint table explains the trade-offs. Selecting a terrain site also sets the planner's Site A or Site B, so the charts and mission windows follow. See the [acceptance report](docs/MILESTONE3_ACCEPTANCE.md).
 
+## Validated Sun and Earth geometry (Milestone 4)
+
+Sun and Earth directions come from JPL Horizons (DE441) in the Moon's body-fixed frame, including libration. They are checked against Horizons' own topocentric output at 9 sites and 40 times: the Sun agrees within 0.001° and the Earth within 0.006°. The 3D terrain view now draws Sun and Earth rays for the selected time, and Surface View reports Earth's phase, apparent size and distance. See the [acceptance report](docs/MILESTONE4_ACCEPTANCE.md).
+
 ## Development repository and milestone recovery
 
 The complete current development project is now maintained in [Muxsinjon/new_luna](https://github.com/Muxsinjon/new_luna). The original `Muxsinjon/lunawindow` repository is retained unchanged. All application source, scientific assets, tests and pipeline scripts are at this repository's root; this is not just an archive repository.
 
-Milestones 1–3 have [separate recovery files](milestones/README.md) and separate acceptance reports in `docs/`. The historical Milestone 1 backup ZIP and its checksum remain at the root; its old README is preserved in `docs/archive/NEW_LUNA_BACKUP_README.md`.
+Milestones 1–4 have [separate recovery files](milestones/README.md) and separate acceptance reports in `docs/`. The historical Milestone 1 backup ZIP and its checksum remain at the root; its old README is preserved in `docs/archive/NEW_LUNA_BACKUP_README.md`.
 
 See [migration and development setup](docs/NEW_LUNA_MIGRATION.md) for audited contents and future Codex/Claude sessions. GitHub Pages deployment is manual-only; normal pushes do not deploy the site.

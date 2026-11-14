@@ -1,8 +1,19 @@
 # LunaWindow project status
 
-Updated 2026-11-15. Branch `milestone-3` on `Muxsinjon/new_luna`, based on `0eabd44`. Milestone 3 is complete and pushed; Milestones 4–9 have not started.
+Updated 2026-11-15. Branch `milestone-4` on `Muxsinjon/new_luna`, based on Milestone 3 (`3b43df0`). Milestone 4 is complete and pushed; Milestones 5–9 have not started.
 
-## Milestone 3: completed
+## Milestone 4: completed (audit, then gaps only)
+
+- **Verified existing:** Horizons preprocessing (MOON_ME, DE441), topocentric ENU geometry including libration, both horizon models, the time slider and shared state, and Earth's angular size.
+- **Improved:** cubic upsampling of the shipped ephemeris. Earth interpolation error fell from 0.0048° to 0.0014° max.
+- **Fixed:** Earth phase is now a tested pure function and includes the Sun's Earth–Moon parallax.
+- **Added:** Sun and Earth rays plus an az/el readout in the 3D terrain views, and a time bar there.
+- **Validation:** 9 sites × 40 Horizons epochs. Sun is within 0.0009°, Earth within 0.0059°, Earth phase within 0.006 percentage points.
+- **Coverage end corrected:** 2031-12-31 18:00 UTC.
+
+See [Milestone 4 acceptance](MILESTONE4_ACCEPTANCE.md).
+
+## Milestone 3: completed (preserved)
 
 - **Sites:** Site01 (Connecting Ridge), Site04 (Shackleton Rim) and Site06 (Nobile Rim 1) are processed by one generalised pipeline (`pipeline/terrain_sites.py`). The Site01 rebuild is byte-identical to Milestones 1 and 2.
 - **UI:** a "Compare A and B" mode with two 3D views, linked cameras, shared thresholds, an equal-footprint comparison table, trade-off text and navigation that keeps sites and dates.

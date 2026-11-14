@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-import { localToSurface, surfaceToLocal, meshArrays, type SurfacePoint, type TerrainAsset } from '../lib/terrainMesh'
+import { bodyDirectionToLocal, localToSurface, surfaceToLocal, meshArrays, type SurfacePoint, type TerrainAsset } from '../lib/terrainMesh'
+import type { Vec3 } from '../lib/geometry'
 import type { HazardVisual } from './HazardPanel'
 import { polarXY, polarLatLon } from '../lib/terrain'
 import { sampleGrid } from '../lib/terrainMesh'
@@ -27,6 +28,7 @@ export default function TerrainCanvas({
   link,
   linked = false,
   label,
+  bodies,
 }: {
   asset: TerrainAsset
   site: SurfacePoint
@@ -40,11 +42,14 @@ export default function TerrainCanvas({
   linked?: boolean
   /** prefixes control names when several canvases share a page */
   label?: string
+  /** Sun and Earth directions (MOON_ME) at the selected time, drawn as rays from the site */
+  bodies?: { sun: Vec3; earth: Vec3 } | null
 }) {
   const host = useRef<HTMLDivElement>(null),
     action = useRef<(a: Action) => void>(() => {}),
     select = useRef<(p: SurfacePoint | null) => void>(() => {})
   const updateVisual = useRef<(v: HazardVisual | null) => void>(() => {})
+  const updateBodies = useRef<(b: { sun: Vec3; earth: Vec3 } | null | undefined) => void>(() => {})
   const pick = useRef(onPick),
     [error, setError] = useState('')
   const following = useRef(linked)
@@ -151,6 +156,35 @@ export default function TerrainCanvas({
       boundaryGeometry.computeBoundingSphere()
       render()
     }
+    const rayGeometry = { sun: new THREE.BufferGeometry(), earth: new THREE.BufferGeometry() }
+    const rayMaterial = {
+      sun: new THREE.LineBasicMaterial({ color: cssVar('--c-sun'), depthTest: false }),
+      earth: new THREE.LineBasicMaterial({ color: cssVar('--c-earth'), depthTest: false }),
+    }
+    for (const k of ['sun', 'earth'] as const) {
+      const line = new THREE.Line(rayGeometry[k], rayMaterial[k])
+      line.renderOrder = 11
+      scene.add(line)
+    }
+    updateBodies.current = (b) => {
+      for (const k of ['sun', 'earth'] as const) {
+        const pts: number[] = []
+        if (b) {
+          const d = bodyDirectionToLocal(b[k], arrays.origin)
+          pts.push(
+            ...sitePos.toArray(),
+            ...sitePos
+              .clone()
+              .add(new THREE.Vector3(...d).multiplyScalar(span * 0.35))
+              .toArray(),
+          )
+          canvas.dataset[k + 'Dir'] = JSON.stringify(d.map((x) => Number(x.toFixed(6))))
+        } else delete canvas.dataset[k + 'Dir']
+        rayGeometry[k].setAttribute('position', new THREE.Float32BufferAttribute(pts, 3))
+        rayGeometry[k].computeBoundingSphere()
+      }
+      render()
+    }
     select.current = (p) => {
       selected.visible = !!p
       if (p) selected.position.set(...surfaceToLocal(p, arrays.origin))
@@ -249,6 +283,11 @@ export default function TerrainCanvas({
     render()
     return () => {
       link?.members.delete(me)
+      updateBodies.current = () => {}
+      for (const k of ['sun', 'earth'] as const) {
+        rayGeometry[k].dispose()
+        rayMaterial[k].dispose()
+      }
       updateVisual.current = () => {}
       overlayMaterial.dispose()
       boundaryGeometry.dispose()
@@ -277,6 +316,9 @@ export default function TerrainCanvas({
   useEffect(() => {
     updateVisual.current(visual)
   }, [visual, asset, site, theme, imagery])
+  useEffect(() => {
+    updateBodies.current(bodies)
+  }, [bodies, asset, site, theme, imagery])
   return (
     <>
       <div className="terrain-toolbar">

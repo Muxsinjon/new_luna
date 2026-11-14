@@ -5,6 +5,7 @@ The complete working project is at the repository root. These files preserve the
 - `MILESTONE_1.patch`: commits after original baseline `f82b293` through `aeb54a6` (3D terrain and final verification).
 - `MILESTONE_2.patch`: commits after `aeb54a6` through `ee376b6` (hazard analysis and slope-discrepancy investigation).
 - `MILESTONE_3.patch`: the Milestone 3 commit after `0eabd44` (multi-site terrain and dual 3D comparison), with binary terrain layers.
-- Separate acceptance reports: `docs/MILESTONE1_ACCEPTANCE.md`, `docs/MILESTONE2_ACCEPTANCE.md` and `docs/MILESTONE3_ACCEPTANCE.md`.
+- `MILESTONE_4.patch`: the Milestone 4 commit after `3b43df0` (astronomy audit, validation and gap fixes).
+- Separate acceptance reports: `docs/MILESTONE1_ACCEPTANCE.md` to `docs/MILESTONE4_ACCEPTANCE.md`.
 
 Use `git am` on the corresponding base only when recovering a missing milestone. Do not apply these patches to this final repository: their commits are already ancestors of main. The original complete Milestone 1 ZIP remains at the root for existing download links.

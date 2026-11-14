@@ -209,3 +209,17 @@ export function terrainSiteFor(sites: TerrainSiteInfo[], plannerId: string, lat:
     }) ?? null
   )
 }
+
+/**
+ * Milestone 4: a MOON_ME direction (any length) expressed in the mesh's local frame (X east, Y up, Z south at the
+ * crop origin), normalised. Near the pole local north rotates across an 8 km crop, so directions must use the
+ * mesh origin's basis, not the azimuth measured at the site.
+ */
+export function bodyDirectionToLocal(v: Vec3, origin: { lat: number; lon: number }): Vec3 {
+  const b = enuBasis(origin.lon, origin.lat)
+  const dot = (a: Vec3) => v[0] * a[0] + v[1] * a[1] + v[2] * a[2]
+  const out: Vec3 = [dot(b.e), dot(b.u), -dot(b.n)]
+  const n = Math.hypot(...out)
+  if (!(n > 0)) throw new RangeError('zero direction')
+  return [out[0] / n, out[1] / n, out[2] / n]
+}

@@ -209,8 +209,9 @@ export default function MissionSummary({ ctx, onClose }: { ctx: SummaryContext; 
         </ul>
         <h3>Data and method</h3>
         <p className="small">
-          Sun and Earth positions: NASA/JPL Horizons (DE441), hourly 2023–2031, validated against Horizons topocentric values (worst
-          0.0034°). Terrain: LRO LOLA. Visibility evaluated on hourly samples; each sample covers the following hour.
+          Sun and Earth positions: NASA/JPL Horizons (DE441), hourly 2023-01-01 to 2031-12-31 18:00 UTC, validated against Horizons
+          topocentric values (Sun within 0.001°, Earth within 0.006°). Terrain: LRO LOLA. Visibility evaluated on hourly samples; each
+          sample covers the following hour.
         </p>
         <h3>Limitations</h3>
         <ul className="small">
