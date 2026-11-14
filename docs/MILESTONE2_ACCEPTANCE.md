@@ -71,7 +71,7 @@ Texture generation changes only display colors/classification; it does not recom
 
 Evidence: [browser validation JSON](data/MILESTONE2_BROWSER_VALIDATION.json), [scientific manifest](../web/public/data/terrain/site01/hazards/hazards.json), [Python tests](../pipeline/test_hazard_site01.py), [frontend tests](../web/src/lib/hazardAnalysis.test.ts), [browser test](../tests/e2e/hazard_test.py). Synthetic surfaces are test-only; none are shipped as scientific measurements.
 
-The official slope difference has a plausible estimator/support contribution, but its exact cause has not been fully calibrated because the supplied README does not specify the official numerical stencil. We do not claim exact agreement. The independently validated, explicitly defined OLS estimator is the screening field.
+The original acceptance did not establish the stencil cause; the follow-up below now identifies estimator weighting as dominant, while the exact NASA implementation remains unconfirmed. We do not claim exact agreement. The independently validated, explicitly defined OLS estimator is the screening field.
 
 ## Checks and browser acceptance
 
@@ -107,6 +107,16 @@ python tests/e2e/hazard_test.py http://127.0.0.1:4173/
 The new browser suite currently uses `/usr/bin/chromium`; change that documented executable when running on another OS. Scientific browser tests require the generated Float32 GeoTIFFs and native-source tests require the raw NASA inputs. These stay outside Git. App runtime needs only checked-in processed assets.
 
 For manual testing: open the existing app with `npm run dev`, choose **3D Terrain**, select Site B / Connecting Ridge, then click the mesh or enter −89.53432°, 209.94767° E. Scroll to **Scientific terrain analysis**. Switch layers and observe the heatmap, change maximum slope/roughness and inspect the point reason. Change footprint radius and inspect its boundary and statistics. Enter a point near a crop corner to see incomplete coverage. Return to Explore & Compare, Finder or Surface View to confirm existing features remain present. Analysis controls are local workspace state, not new shared-URL mission parameters.
+
+## Slope-discrepancy follow-up
+
+The discrepancy is now investigated across all 2,563,201 crop samples. **Estimator/stencil weighting is the dominant cause**: a four-neighbour projected central gradient matches the official raster at 0.000272° RMS / 0.010948° maximum, versus OLS's 0.505067° / 15.244853°. Both use native 5 m data and the same nominal 3×3 extent; OLS averages diagonals/axial differences differently. No OLS implementation error was identified. Production scientific bytes remain unchanged.
+
+NoData, resampling and one-cell misregistration do not explain the large errors. The physical-distance correction contributes at most 0.028454°. All >10° differences are interior. Error p50/p95/p99/p99.9: 0.141100° / 1.031814° / 1.955439° / 3.953996°. There are 1183 cells >5° (0.046153%) and 45 >10° (0.001756%). Worst location: −89.54892118°, 220.52292091° E; OLS 19.823724°, official 35.068577°.
+
+At a 10° threshold, 48,632 slope-only decisions differ (1.897315%); with the same 0.3 m RMS condition, 42,410 combined decisions differ (1.654572%). The UI explicitly labels OLS and warns that it is not NASA's supplied slope raster. This preserves existing criteria semantics without implying equivalence. The near-matching central method is not proven to be NASA's exact implementation; 164 small residuals exceed final-file Float32 rounding bounds, and their exact source remains unconfirmed.
+
+Full causal controls, percentile/frequency tables, top locations, spatial bins, threshold directions and remaining residuals: [slope investigation](SITE01_SLOPE_DISCREPANCY.md) and [JSON evidence](data/SITE01_SLOPE_DISCREPANCY.json). Re-run `python pipeline/investigate_site01_slope.py`. Follow-up verification: 73 JS / 14 Python tests, lint, formatting, build and all three browser suites pass. No remote work or Milestone 3.
 
 ## Scientific limits and optional future work
 

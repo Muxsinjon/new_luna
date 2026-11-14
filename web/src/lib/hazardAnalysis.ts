@@ -11,6 +11,7 @@ export interface HazardMeta {
   dy: number
   quantum: number
   noData: number
+  officialComparison: { rmsDifferenceDeg: number; maxAbsDifferenceDeg: number }
   slopeSupportM: number
   roughnessSupportM: number
   sourceSha256: string

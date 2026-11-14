@@ -49,3 +49,7 @@ The previous Google Fonts proxy-certificate failure is resolved at the applicati
 ## Review and reproduction
 
 See [TERRAIN_3D.md](TERRAIN_3D.md) for source metadata and commands, [MILESTONE1_ACCEPTANCE.md](MILESTONE1_ACCEPTANCE.md) for final evidence, and [local PR draft](PULL_REQUEST_MILESTONE_1.md) for later review. Run `cd web && npm run dev`, choose **3D Terrain**, and select **Site B** or **Show Connecting Ridge**. Use the existing isolated checkout; do not create an extra Git worktree for routine cloud development.
+
+## Slope discrepancy follow-up
+
+Full-crop investigation identifies estimator weighting as dominant, not NoData/resampling/edge or pixel-alignment errors. Four-neighbour projected central reconstruction agrees with NASA to 0.000272° RMS / 0.010948° maximum. Production OLS remains independently valid and unchanged; UI labels and a persistent warning explicitly disallow equivalence to NASA's raster. OLS p95/p99 differences are 1.031814° / 1.955439°; 1183 cells exceed 5° difference, 45 exceed 10°. At 10° / 0.3 m defaults, swapping only the slope estimator flips 42,410 combined decisions (1.654572%). Exact small central-gradient residuals are not fully explained. See [investigation and locations](SITE01_SLOPE_DISCREPANCY.md). Follow-up checks: 73 JS tests, 14 Python tests, lint/format/build and existing smoke/M1 terrain/M2 hazard suites pass. No remote changes.

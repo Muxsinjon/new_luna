@@ -14,6 +14,8 @@ with sync_playwright() as p:
  page.goto(base+'#ws=terrain&a=connecting-ridge&sv=A')
  canvas=page.locator('.terrain-canvas canvas');expect(canvas).to_be_visible(timeout=30000)
  expect(page.get_by_label('Analysis layer')).to_be_visible(timeout=30000)
+ expect(page.get_by_test_id('slope-method-warning')).to_contain_text('not NASA')
+ expect(page.get_by_test_id('slope-method-warning')).to_contain_text('15.245°')
  page.get_by_label('Latitude (degrees)',exact=True).fill('-89.53432');page.get_by_label('East longitude (degrees)',exact=True).fill('209.94767');page.get_by_role('button',name='Inspect coordinates',exact=True).click()
  point=page.get_by_test_id('hazard-point');expect(point).to_contain_text('Slope')
  camera=canvas.get_attribute('data-camera')

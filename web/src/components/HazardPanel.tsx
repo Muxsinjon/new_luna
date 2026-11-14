@@ -132,13 +132,19 @@ export default function HazardPanel({
         <p role="status">Loading source-derived scientific layers…</p>
       ) : (
         <>
+          <p className="hint" data-testid="slope-method-warning">
+            Slope screening uses our 3 × 3 OLS fitted plane, not NASA’s supplied slope raster. Estimator choice can change threshold
+            classifications: full-crop comparison differs by {data.meta.officialComparison.rmsDifferenceDeg.toFixed(3)}° RMS and up to{' '}
+            {data.meta.officialComparison.maxAbsDifferenceDeg.toFixed(3)}°. Agreement with a central-gradient reconstruction does not
+            establish the exact NASA method.
+          </p>
           <div className="terrain-toolbar">
             <label className="field">
               Analysis layer
               <select aria-label="Analysis layer" value={layer} onChange={(e) => setLayer(e.target.value as AnalysisLayer)}>
                 {(['elevation', 'slope', 'roughness', 'hazard'] as const).map((l) => (
                   <option key={l} value={l}>
-                    {l === 'hazard' ? 'Hazard Assessment' : l[0].toUpperCase() + l.slice(1)}
+                    {l === 'hazard' ? 'Hazard Assessment' : l === 'slope' ? 'Slope (3×3 OLS)' : l[0].toUpperCase() + l.slice(1)}
                   </option>
                 ))}
               </select>
@@ -190,7 +196,7 @@ export default function HazardPanel({
           </p>
           <p data-testid="analysis-legend">
             {layer === 'slope'
-              ? 'Slope legend: blue 0° → orange ≥30°; gray unavailable.'
+              ? 'OLS fitted-plane slope legend: blue 0° → orange ≥30°; gray unavailable.'
               : layer === 'roughness'
                 ? 'Roughness legend: blue 0 m → orange ≥1 m RMS; gray unavailable.'
                 : layer === 'hazard'
@@ -207,7 +213,7 @@ export default function HazardPanel({
                   : 'Insufficient or unavailable data'}
             </strong>
             <p>
-              Slope {format(values?.slope ?? null, '°')}; roughness {format(values?.roughness ?? null, 'm')}.
+              Slope (3×3 OLS) {format(values?.slope ?? null, '°')}; roughness {format(values?.roughness ?? null, 'm')}.
             </p>
             {state === 'exceeds' && (
               <p>
