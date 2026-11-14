@@ -211,6 +211,21 @@ export default function About({ data }: { data: AppData }) {
           The ephemeris covers 2023-01-01 00:00 to 2031-12-31 18:00 UTC at 1-hour steps (the last shipped 6-hourly row). Times outside are
           never extrapolated. Sun directions agree with JPL Horizons within 0.001° and Earth directions within 0.006°.
         </li>
+        <li>
+          Hourly sampling, checked against 10-minute sampling at all nine polar sites over 2023–2031: the share of time with sunlight or
+          Earth in view changes by at most 0.01 percentage points. Over those nine years it misses 13 brief sunlight changes (none longer
+          than 50 minutes) and one 30-minute Earth change, and every other rise or set falls within its reported one-hour window.
+        </li>
+        <li>
+          “Sun visible” means any part of the disc clears the terrain. The comparison table also reports the full disc, partial disc only,
+          and disc-weighted sunlight, so partial sunlight is never counted as full power.
+        </li>
+        <li>
+          On the 5 m terrain sites, the sunlight and Earth line-of-sight layers are computed for the selected time every 80 m. Compared with
+          a native 5 m reference, horizon errors are 0.01–0.04° median and about 0.7° at the 95th percentile inside the inner 6 × 6 km; the
+          1 km band at each crop edge is illustrative. The permanently shadowed region map (NASA PGDA, 20 m) is static context.
+        </li>
+        <li>Earth line of sight is geometric. It is not a radio link budget and does not guarantee communication.</li>
         <li>Coordinates marked “Needs verification” still need a primary-source check.</li>
       </ul>
       <p className="muted">The full tables are in the repository at {LINKS.repoValidation}.</p>

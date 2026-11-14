@@ -1,3 +1,4 @@
+import { loadIllumination, type IlluminationAsset } from './terrainShadow'
 import { loadHazards, type HazardData } from './hazardAnalysis'
 import { loadTerrainAsset, type TerrainAsset } from './terrainMesh'
 
@@ -17,6 +18,18 @@ export function loadSiteLayers(siteId: string) {
     }))
     p.catch(() => cache.delete(siteId))
     cache.set(siteId, p)
+  }
+  return p
+}
+
+const illum = new Map<string, Promise<IlluminationAsset>>()
+/** Session cache of a site's verified illumination inputs (far-field horizon grid and PSR sample). */
+export function loadSiteIllumination(siteId: string) {
+  let p = illum.get(siteId)
+  if (!p) {
+    p = loadIllumination(undefined, siteId)
+    p.catch(() => illum.delete(siteId))
+    illum.set(siteId, p)
   }
   return p
 }

@@ -58,11 +58,13 @@ with sync_playwright() as p:
 
     def compare_and_models():
         expect(page.get_by_role("heading", name="Site comparison over the mission")).to_be_visible()
-        expect(page.locator(".cmp-table tbody tr")).to_have_count(11)
+        # terrain-aware: 11 rows + full disc / partial disc / disc-weighted sunlight (Milestone 5)
+        expect(page.locator(".cmp-table tbody tr")).to_have_count(14)
         page.get_by_label("Highlight differences").check()
         expect(page.get_by_role("img", name=re.compile("Sun: A only"))).to_be_visible()
         page.get_by_role("radio", name="Geometric 0°").click()
         expect(page.get_by_text("Geometric visibility: local terrain obstruction not included").first).to_be_visible()
+        expect(page.locator(".cmp-table tbody tr")).to_have_count(11)  # partial discs are not resolved geometrically
         page.get_by_role("radio", name="Terrain-aware").click()
 
     def finder_and_why():

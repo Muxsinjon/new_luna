@@ -52,6 +52,15 @@ Reference: LOLA average visibility maps, Mazarico et al. (2011) Icarus 211, PGDA
 
 Differences of up to about 7 points are expected: we use 240 m terrain (they use 120 m), 2023–2031 (they use an 18.6-year average), and a 2 m observer.
 
+## 2b. Milestone 5: 3D lighting layers, PSR and sampling
+
+- **Horizons on the 5 m sites vs a native 5 m reference:** inner median 0.01–0.04°, p95 0.28–0.67°.
+- **Long-term sunlight vs NASA AVGVISIB:** 81 points per crop, median absolute difference 0.9–2.0 percentage points.
+- **PSR:** all 33 Shackleton PSR points are never lit.
+- **Hourly vs 10-minute sampling:** at most 0.01 percentage points of time, 14 missed sub-hour flickers in 81 site-years.
+
+See [MILESTONE5_ACCEPTANCE.md](MILESTONE5_ACCEPTANCE.md).
+
 ## 3. Real mission: Chandrayaan-3 (ISRO), 69.373 S 32.319 E
 
 Our terrain-aware model (upper-limb rule, no tuning) predicts: **sunrise** 2023-08-21 11:20 UTC, then **sunset** 2023-09-04 09:00 UTC, then **sunrise** 2023-09-19 20:10 UTC. The Sun was 8.62° above the smooth horizon at touchdown.

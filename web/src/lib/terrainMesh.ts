@@ -159,7 +159,7 @@ export function meshArrays(asset: TerrainAsset) {
   if (!indices.length) throw new Error('No valid terrain triangles')
   return { origin, positions, uv, indices: new Uint32Array(indices) }
 }
-async function checkedFile(base: string, file: { file: string; sha256: string }, signal?: AbortSignal) {
+export async function checkedFile(base: string, file: { file: string; sha256: string }, signal?: AbortSignal) {
   const r = await fetch(base + file.file, { signal })
   if (!r.ok) throw new Error(`Could not load terrain ${file.file} (HTTP ${r.status})`)
   const bytes = await r.arrayBuffer(),

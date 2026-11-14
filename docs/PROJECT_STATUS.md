@@ -1,8 +1,21 @@
 # LunaWindow project status
 
-Updated 2026-11-15. Branch `milestone-4` on `Muxsinjon/new_luna`, based on Milestone 3 (`3b43df0`). Milestone 4 is complete and pushed; Milestones 5–9 have not started.
+Updated 2026-11-15. Branch `milestone-5` on `Muxsinjon/new_luna`, based on Milestone 4 (`09f42c0`). Milestone 5 is complete and pushed; Milestones 6–9 have not started.
 
-## Milestone 4: completed (audit, then gaps only)
+## Milestone 5: completed (audit, then gaps only)
+
+- **Verified existing:** planner horizon masks (240 m, 250 km, exact sphere, 2 m observer), both visibility models, partial-disc handling, combined timelines and blackout metrics, and the AVGVISIB overlays.
+- **Added:** time-dependent sunlight and Earth line-of-sight layers on the 3D terrain sites (single and compare views), plus NASA's 20 m PSR map as static context.
+- **Added:** full / partial / disc-weighted sunlight metrics, and a bounded statement of what hourly sampling misses.
+- **Validation:**
+  - Horizons vs a native 5 m reference: inner median 0.01–0.04°, p95 0.28–0.67°.
+  - Long-term sunlight vs NASA AVGVISIB: median difference 0.9–2.0 percentage points, correlation 0.90–0.98.
+  - Shackleton PSR points: never lit.
+  - Hourly vs 10-minute sampling: at most 0.01 percentage points.
+
+See [Milestone 5 acceptance](MILESTONE5_ACCEPTANCE.md).
+
+## Milestone 4: completed (preserved)
 
 - **Verified existing:** Horizons preprocessing (MOON_ME, DE441), topocentric ENU geometry including libration, both horizon models, the time slider and shared state, and Earth's angular size.
 - **Improved:** cubic upsampling of the shipped ephemeris. Earth interpolation error fell from 0.0048° to 0.0014° max.

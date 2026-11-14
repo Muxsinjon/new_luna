@@ -3,10 +3,11 @@ import type * as THREE from 'three'
 import { analysisAt, classify, footprint, loadHazards, type AnalysisLayer, type Criteria, type HazardData } from '../lib/hazardAnalysis'
 import { type SurfacePoint, type TerrainAsset } from '../lib/terrainMesh'
 import { hazardAligned, useHazardTexture, type HazardSettings } from './hazardTexture'
+import type { LightingLayer } from './lightingOverlay'
 export interface HazardVisual {
   texture: THREE.Texture | null
   footprint: { point: SurfacePoint; radius: number } | null
-  layer: AnalysisLayer
+  layer: AnalysisLayer | LightingLayer
 }
 export default function HazardPanel({
   asset,

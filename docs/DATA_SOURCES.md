@@ -2,6 +2,14 @@
 
 Updated 2026-11-14. Reference directory: user-supplied `Lunar_Landing_Navigator_NASA_JPL_Data_Sources.docx` (17 categories). That document is a discovery directory, not verification. Status below distinguishes existing integration, newly verified products and future/uninspected collections. No remote publication is implied.
 
+## Milestone 5 illumination records
+
+| Record | Product / file | Use | Notes |
+|---|---|---|---|
+| PGDA product 90 permanently shadowed regions | `LPSR_80S_20MPP_ADJ.TIF` (20 m, south polar stereographic, MOON_ME/DE421, 0/1) | static PSR context layer on the 3D sites; PSR validation | read by HTTP range (COG window) per crop; window bytes hashed in `terrain/<site>/illumination/illumination.json` |
+| PGDA product 69 average visibility | `AVGVISIB_75S_120M_201608(_EARTH).TIF` (int16, scale 4e-05 = fraction of time) | independent long-term validation of computed sunlight / Earth visibility | existing raw files; 18.6-year average at 120 m, not a date prediction |
+| Far-field horizon grids | derived from LOLA LDEM_75S_240M | terrain outside each 8 km crop for the 3D lighting layers | `far_el.i16` (0.01°), `far_d.u16` (0.1 km), 21 × 21 × 720 per site |
+
 ## Milestone 4 astronomy records
 
 | Record | Request | Use |

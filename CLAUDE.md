@@ -45,6 +45,7 @@ There is also a welcome screen, a guided demo and a mission summary export. **Pl
   - `dem_polar.json/.bin` is Int16 LE in metres above the 1737.4 km sphere. It uses a south polar stereographic grid `n×n`, `scaleM` per pixel, centre `offsetPx`, and covers lat ≤ `minLat`.
   - `dem_global.json/.bin` is Int16 LE, simple cylindrical, `ppd` pixels per degree, row 0 at 90° N, column 0 at 0° E.
 - `pgda_sun.bin`, `pgda_earth.bin`: Uint8 on the polar grid. Values are % of time visible; 255 means no data.
+- `terrain/<site>/illumination/` (Milestone 5): `illumination.json` plus `far_el.i16` (Int16 LE, 0.01°) and `far_d.u16` (Uint16 LE, 0.1 km), 21 × 21 × 720 far-field horizons outside the crop; `psr.u8` (401 × 401, 1 PSR / 0 / 255 no data, NASA PGDA product 90, static context). Browser algorithm: `lib/terrainShadow.ts`.
 - `validation.json`: `{ period, worstElevationErrorDeg, sites[], illumination{}, missions[] }`.
 - Mission Window Finder: `lib/finder.ts`. Candidate statuses are meets / partial (at most half of the active requirements fail) / fails / insufficient. Ranking: status, then fewer failures, then joint %, then shorter darkness, then earlier start. Explanations are generated only from computed numbers (`checkSentence`).
 - In-app time series: `Sample` in `web/src/lib/analysis.ts`. It has az/el, terrain horizon, margin and disc fraction for both the Sun and Earth, at the time `t` (ms UTC).

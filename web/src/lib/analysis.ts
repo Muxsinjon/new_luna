@@ -190,6 +190,14 @@ export interface WindowSummary {
   linkInterruptions: number
   maxSunEl: number
   avgPowerVertical: number
+  /**
+   * Milestone 5 sunlight definitions (terrain model only; null in the geometric model, which does not resolve
+   * partial discs): share of samples with the FULL disc above the terrain horizon, with only PART of it, and the
+   * mean visible disc fraction (disc-weighted sunlight, never counting partial sunlight as full).
+   */
+  sunFullPct: number | null
+  sunPartialPct: number | null
+  sunDiscWeightedPct: number | null
 }
 
 /** Samples whose start lies in [t0, t1): each covers [t, t + 1 h) (half-open). */
@@ -211,11 +219,28 @@ export function summarizeSamples(samples: Sample[], stepMs: number, model: VisMo
   const r = runsSummary(f, t, stepMs)
   let p = 0
   let maxSunEl = -90
+  let full = 0,
+    partial = 0,
+    frac = 0
   for (const s of samples) {
     p += panelPower(s, 'vertical', PANEL_EFFICIENCY, model)
     maxSunEl = Math.max(maxSunEl, s.sunEl)
+    if (s.sunFrac >= 1) full++
+    else if (s.sunFrac > 0) partial++
+    frac += s.sunFrac
   }
-  return { model, stepMs, ...r, maxSunEl, avgPowerVertical: samples.length ? p / samples.length : 0 }
+  const n = samples.length
+  const terrain = model === 'terrain' && n > 0
+  return {
+    model,
+    stepMs,
+    ...r,
+    maxSunEl,
+    avgPowerVertical: n ? p / n : 0,
+    sunFullPct: terrain ? (100 * full) / n : null,
+    sunPartialPct: terrain ? (100 * partial) / n : null,
+    sunDiscWeightedPct: terrain ? (100 * frac) / n : null,
+  }
 }
 
 /** Full-range hourly visibility flags for one site and model (cached). */

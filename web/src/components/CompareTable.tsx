@@ -20,8 +20,39 @@ interface Row {
 const h = (ms: number) => Math.round(ms / HOUR)
 
 export function compareRows(A: WindowSummary, B: WindowSummary): Row[] {
+  // full / partial / disc-weighted sunlight exist only in the terrain model (the geometric model does not resolve partial discs)
+  const disc: Row[] =
+    A.sunFullPct !== null && B.sunFullPct !== null && A.sunPartialPct !== null && B.sunPartialPct !== null
+      ? [
+          {
+            label: 'Full Sun disc visible',
+            a: A.sunFullPct,
+            b: B.sunFullPct,
+            fmt: fmtPct,
+            better: true,
+            phrase: 'more full-disc sunlight',
+          },
+          { label: 'Only part of the Sun visible', a: A.sunPartialPct, b: B.sunPartialPct, fmt: fmtPct, better: null },
+          {
+            label: 'Sunlight, disc-weighted',
+            a: A.sunDiscWeightedPct ?? 0,
+            b: B.sunDiscWeightedPct ?? 0,
+            fmt: fmtPct,
+            better: null,
+          },
+        ]
+      : []
   return [
-    { label: 'Sun visible', info: 'sun', a: A.sunPct, b: B.sunPct, fmt: fmtPct, better: true, phrase: 'more sunlight' },
+    {
+      label: 'Sun visible (any part of the disc)',
+      info: 'sun',
+      a: A.sunPct,
+      b: B.sunPct,
+      fmt: fmtPct,
+      better: true,
+      phrase: 'more sunlight',
+    },
+    ...disc,
     { label: 'Earth visible', info: 'earth', a: A.earthPct, b: B.earthPct, fmt: fmtPct, better: true, phrase: 'more Earth visibility' },
     { label: 'Sun and Earth together', info: 'ops', a: A.bothPct, b: B.bothPct, fmt: fmtPct, better: true, phrase: 'more time with both' },
     { label: 'Only the Sun', a: A.sunOnlyPct, b: B.sunOnlyPct, fmt: fmtPct, better: null },

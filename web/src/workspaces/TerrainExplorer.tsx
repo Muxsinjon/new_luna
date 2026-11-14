@@ -3,6 +3,8 @@ import { DEFAULT_HAZARD_SETTINGS, type HazardSettings } from '../components/haza
 import HazardPanel, { type HazardVisual } from '../components/HazardPanel'
 import SitePair from '../components/SitePair'
 import SkyReadout from '../components/SkyReadout'
+import LightingPanel from '../components/LightingPanel'
+import { useLightingOverlay, useSiteIllumination, type LightingLayer } from '../components/lightingOverlay'
 import TimeBar from '../components/TimeBar'
 import { bodyVectorsFromSite } from '../lib/analysis'
 import TerrainCanvas, { type CameraLink } from '../components/TerrainCanvas'
@@ -30,6 +32,7 @@ export default function TerrainExplorer() {
     [pickError, setPickError] = useState(''),
     [imagery, setImagery] = useState(false)
   const [visual, setVisual] = useState<HazardVisual | null>(null)
+  const [lighting, setLighting] = useState<LightingLayer>('off')
   const [index, setIndex] = useState<TerrainIndex | null>(null),
     [mode, setMode] = useState<'single' | 'compare'>('single'),
     [settings, setSettings] = useState<HazardSettings>(DEFAULT_HAZARD_SETTINGS),
@@ -96,6 +99,12 @@ export default function TerrainExplorer() {
   const bodies = useMemo(
     () => (current ? bodyVectorsFromSite(data.eph, s.selectedTime, current.lat, current.lon, current.elevationM) : null),
     [current, data, s.selectedTime],
+  )
+  const illum = useSiteIllumination(lighting === 'off' || !info ? null : terrainId)
+  const light = useLightingOverlay(shown, illum?.data ?? null, lighting, data.eph, s.selectedTime, theme)
+  const shownVisual = useMemo<HazardVisual | null>(
+    () => (lighting === 'off' ? visual : { texture: light.texture, layer: lighting, footprint: visual?.footprint ?? null }),
+    [lighting, visual, light.texture],
   )
   const pick = (p: SurfacePoint) => {
     setPicked(p)
@@ -220,7 +229,23 @@ export default function TerrainExplorer() {
                 <input type="checkbox" checked={linked} onChange={(e) => setLinked(e.target.checked)} /> Link cameras (same scale and
                 viewing direction)
               </label>
+              <label className="field">
+                Lighting layer (both sites)
+                <select aria-label="Lighting layer" value={lighting} onChange={(e) => setLighting(e.target.value as LightingLayer)}>
+                  <option value="off">Off (use the overlay layer)</option>
+                  <option value="sunlight">Sunlight at the selected time (computed)</option>
+                  <option value="earth">Earth line of sight at the selected time (computed)</option>
+                  <option value="psr">Permanently shadowed regions (NASA PGDA, static context)</option>
+                </select>
+              </label>
             </div>
+            {lighting !== 'off' && (
+              <p className="hint">
+                Lighting is computed for each site at the selected time from its own terrain (20 m mesh inside the crop, LOLA 240 m outside,
+                2 m observer, upper-limb rule). Faded areas within 1 km of a crop edge are illustrative. Earth line of sight is geometric
+                and does not guarantee communication. The permanent-shadow map is static context, not a date prediction.
+              </p>
+            )}
             <p className="hint">
               Linked views share the camera offset in metres around each site, so both terrains appear at the same physical scale and
               orientation (X east, Y up, Z south). The two crops are separate places; side by side does not mean adjacent.
@@ -241,6 +266,7 @@ export default function TerrainExplorer() {
                     link={link}
                     linked={linked}
                     onResult={onResult}
+                    lighting={lighting}
                   />
                 ) : (
                   <section className="panel terrain-pane" key={slot} data-testid={`terrain-pane-${slot}`}>
@@ -297,7 +323,7 @@ export default function TerrainExplorer() {
                 imagery={imagery}
                 theme={theme}
                 onPick={pick}
-                visual={visual}
+                visual={shownVisual}
                 bodies={bodies}
               />
             ) : (
@@ -312,6 +338,18 @@ export default function TerrainExplorer() {
               </div>
             )}
             {current && <SkyReadout site={st} slot={s.surfaceSite} />}
+            {current && (
+              <LightingPanel
+                layer={lighting}
+                onLayer={setLighting}
+                asset={shown}
+                illum={illum?.data ?? null}
+                error={illum?.error ?? ''}
+                stats={light.stats}
+                point={picked ?? current}
+                site={st}
+              />
+            )}
             <p className="hint">
               Drag to rotate, scroll or pinch to zoom, right drag or two fingers to pan. Focus the canvas and use arrow keys to pan, or use
               the camera buttons. Click terrain to select a point. Magenta marks the mission site; cyan marks your picked point. Local axes:
