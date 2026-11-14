@@ -207,6 +207,9 @@ export default function TerrainExplorer() {
             <button type="button" className="btn" onClick={() => set({ ws: 'surface' })}>
               Surface view
             </button>
+            <button type="button" className="btn" onClick={() => set({ ws: 'surface', surface3d: true })}>
+              Enter first-person view
+            </button>
           </div>
         )}
         {error ? (

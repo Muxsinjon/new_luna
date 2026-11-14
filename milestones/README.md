@@ -8,6 +8,7 @@ The complete working project is at the repository root. These files preserve the
 - `MILESTONE_4.patch`: the Milestone 4 commit after `3b43df0` (astronomy audit, validation and gap fixes).
 - `MILESTONE_5.patch`: the Milestone 5 commit after `09f42c0` (terrain-aware sunlight and Earth line of sight), with binary illumination inputs.
 - `MILESTONE_6.patch`: the Milestone 6 commit after `ac22e2f` (explainable mission-date recommendation).
-- Separate acceptance reports: `docs/MILESTONE1_ACCEPTANCE.md` to `docs/MILESTONE6_ACCEPTANCE.md`.
+- `MILESTONE_7.patch`: the Milestone 7 commit after `bdbd5cd` (immersive surface view, optional WebXR).
+- Separate acceptance reports: `docs/MILESTONE1_ACCEPTANCE.md` to `docs/MILESTONE7_ACCEPTANCE.md`.
 
 Use `git am` on the corresponding base only when recovering a missing milestone. Do not apply these patches to this final repository: their commits are already ancestors of main. The original complete Milestone 1 ZIP remains at the root for existing download links.

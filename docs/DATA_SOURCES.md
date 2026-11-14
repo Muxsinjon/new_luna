@@ -2,6 +2,17 @@
 
 Updated 2026-11-14. Reference directory: user-supplied `Lunar_Landing_Navigator_NASA_JPL_Data_Sources.docx` (17 categories). That document is a discovery directory, not verification. Status below distinguishes existing integration, newly verified products and future/uninspected collections. No remote publication is implied.
 
+## Milestone 7 immersive view records
+
+No new downloads. The first-person view reuses:
+- PGDA product 78 meshes (Milestone 1/3);
+- Milestone 5 far-field horizons and PSR inputs;
+- the Horizons ephemeris (Milestone 4).
+
+Surface imagery is deliberately not used:
+- LROC WAC registration is unverified (Milestone 1).
+- LROC NAC / QuickMap and ShadowCam products were not integrated, because no registered, licence-checked tiles for the crops exist in the repository.
+
 ## Milestone 6 finder records
 
 No new external data. The finder combines existing, attributed inputs:

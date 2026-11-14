@@ -1,8 +1,23 @@
 # LunaWindow project status
 
-Updated 2026-11-15. Branch `milestone-6` on `Muxsinjon/new_luna`, based on Milestone 5 (`ac22e2f`). Milestone 6 is complete and pushed; Milestones 7–9 have not started.
+Updated 2026-11-15. Branch `milestone-7` on `Muxsinjon/new_luna`, based on Milestone 6 (`bdbd5cd`). Milestone 7 is complete and pushed; Milestones 8–9 have not started.
 
-## Milestone 6: completed (audit, then gaps only)
+## Milestone 7: completed (desktop first, optional VR)
+
+- **Verified existing:** the 360° horizon panorama, now also the fallback.
+- **Added:** a 3D first-person view on the three 5 m sites. It uses:
+  - the same verified mesh;
+  - the Milestone 4 Sun/Earth directions (true angular sizes, Earth phase from lighting);
+  - the Milestone 5 computed shadows;
+  - the 240 m silhouette beyond the crop;
+  - a black sky.
+- **Controls and overlays:** walking, look-at buttons, field of view, eye height, a horizon-profile overlay and hazard spots.
+- **WebXR:** offered only when supported, look-around only.
+- **Proof:** view directions equal the Milestone 4 values within 1e-6°. Rendered Sun pixels are hidden or visible exactly as the horizon calculation says. The horizon matches the planner mask within a median of 0.2–0.6°.
+
+See [Milestone 7 acceptance](MILESTONE7_ACCEPTANCE.md).
+
+## Milestone 6: completed (preserved)
 
 - **Verified existing:** finder search, thresholds, statuses, coverage handling, explanations, overview grid and hand-offs.
 - **Added:**

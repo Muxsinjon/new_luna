@@ -188,10 +188,19 @@ On the 5 m terrain sites, **3D Terrain** can show where the Sun and Earth are vi
 
 The **Mission Window Finder** separates hard requirements (sunlight, Earth visibility, darkness, blackout and, on the 5 m sites, a terrain footprint) from soft preferences (weights). Every ranked window shows its score breakdown. Sites without processed terrain are marked insufficient data rather than passing. The search and its results download as a reproducible JSON scenario. See the [acceptance report](docs/MILESTONE6_ACCEPTANCE.md).
 
+## Immersive surface view (Milestone 7)
+
+At Connecting Ridge, Shackleton Rim and Nobile Rim 1, **Surface View → 3D first person** puts you on NASA's 5 m terrain at the selected time:
+- The Sun and Earth sit at their calculated bearings and true sizes, with Earth's phase.
+- The sky is black, and shadows come from the horizon calculation.
+- You can walk, look at the Sun or Earth, and see the horizon profile.
+
+Other sites keep the 360° horizon panorama. VR is offered only where the browser supports it. See the [acceptance report](docs/MILESTONE7_ACCEPTANCE.md).
+
 ## Development repository and milestone recovery
 
 The complete current development project is now maintained in [Muxsinjon/new_luna](https://github.com/Muxsinjon/new_luna). The original `Muxsinjon/lunawindow` repository is retained unchanged. All application source, scientific assets, tests and pipeline scripts are at this repository's root; this is not just an archive repository.
 
-Milestones 1–6 have [separate recovery files](milestones/README.md) and separate acceptance reports in `docs/`. The historical Milestone 1 backup ZIP and its checksum remain at the root; its old README is preserved in `docs/archive/NEW_LUNA_BACKUP_README.md`.
+Milestones 1–7 have [separate recovery files](milestones/README.md) and separate acceptance reports in `docs/`. The historical Milestone 1 backup ZIP and its checksum remain at the root; its old README is preserved in `docs/archive/NEW_LUNA_BACKUP_README.md`.
 
 See [migration and development setup](docs/NEW_LUNA_MIGRATION.md) for audited contents and future Codex/Claude sessions. GitHub Pages deployment is manual-only; normal pushes do not deploy the site.

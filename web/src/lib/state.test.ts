@@ -8,6 +8,7 @@ describe('shared mission state in the URL', () => {
       siteA: 'im-2',
       siteB: 'custom:-88.6947,309.0939',
       surfaceSite: 'B' as const,
+      surface3d: true,
       durationDays: 3,
       ws: 'finder' as const,
       mode: 'explore' as const,

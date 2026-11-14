@@ -879,3 +879,49 @@ dialog.summary::backdrop {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Milestone 7: first-person surface view */
+.fp-view {
+  width: 100%;
+  height: clamp(320px, 60vh, 680px);
+  overflow: hidden;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-lg);
+  background: var(--c-sky-night);
+}
+.fp-view canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.fp-compass {
+  margin-block: var(--s-2);
+}
+.fp-profile {
+  width: 100%;
+  height: auto;
+  background: var(--c-sky-night);
+  border-radius: var(--r-sm);
+}
+.fp-h-site {
+  fill: none;
+  stroke: var(--c-terrain-edge);
+  stroke-width: 2;
+}
+.fp-h-planner {
+  fill: none;
+  stroke: var(--c-text-muted);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+.fp-h-heading {
+  stroke: var(--c-accent);
+  stroke-width: 1;
+}
+.fp-h-sun {
+  fill: var(--c-sun);
+}
+.fp-h-earth {
+  fill: var(--c-earth);
+}
