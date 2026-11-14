@@ -2,6 +2,15 @@
 
 Updated 2026-11-14. Reference directory: user-supplied `Lunar_Landing_Navigator_NASA_JPL_Data_Sources.docx` (17 categories). That document is a discovery directory, not verification. Status below distinguishes existing integration, newly verified products and future/uninspected collections. No remote publication is implied.
 
+## Milestone 6 finder records
+
+No new external data. The finder combines existing, attributed inputs:
+- JPL Horizons geometry (Milestone 4);
+- LOLA horizon masks (Milestone 5);
+- PGDA product 78 5 m slope and roughness (Milestones 2–3), only at the processed sites and never transferred between sites.
+
+The downloaded scenario JSON lists these sources and the method.
+
 ## Milestone 5 illumination records
 
 | Record | Product / file | Use | Notes |

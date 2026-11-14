@@ -1,8 +1,23 @@
 # LunaWindow project status
 
-Updated 2026-11-15. Branch `milestone-5` on `Muxsinjon/new_luna`, based on Milestone 4 (`09f42c0`). Milestone 5 is complete and pushed; Milestones 6–9 have not started.
+Updated 2026-11-15. Branch `milestone-6` on `Muxsinjon/new_luna`, based on Milestone 5 (`ac22e2f`). Milestone 6 is complete and pushed; Milestones 7–9 have not started.
 
-## Milestone 5: completed (audit, then gaps only)
+## Milestone 6: completed (audit, then gaps only)
+
+- **Verified existing:** finder search, thresholds, statuses, coverage handling, explanations, overview grid and hand-offs.
+- **Added:**
+  - an optional hard terrain requirement on the 5 m sites (unknown terrain is insufficient data, never a pass);
+  - soft preference weights with a visible normalised score and contributions;
+  - deterministic ties;
+  - URL persistence;
+  - a downloadable reproducible scenario and results;
+  - "Open in 3D terrain".
+- **Default weights** reproduce the previous ranking exactly.
+- **End to end on real data:** Shackleton Rim fails the illustrative terrain screen (0 %), while Nobile Rim 1 passes (99.5 %). The ranking re-derives independently from the downloaded components.
+
+See [Milestone 6 acceptance](MILESTONE6_ACCEPTANCE.md).
+
+## Milestone 5: completed (preserved)
 
 - **Verified existing:** planner horizon masks (240 m, 250 km, exact sphere, 2 m observer), both visibility models, partial-disc handling, combined timelines and blackout metrics, and the AVGVISIB overlays.
 - **Added:** time-dependent sunlight and Earth line-of-sight layers on the 3D terrain sites (single and compare views), plus NASA's 20 m PSR map as static context.

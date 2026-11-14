@@ -184,10 +184,14 @@ Sun and Earth directions come from JPL Horizons (DE441) in the Moon's body-fixed
 
 On the 5 m terrain sites, **3D Terrain** can show where the Sun and Earth are visible at the selected time, computed from the site's own terrain plus LOLA terrain out to 250 km. NASA's permanently shadowed regions are available as a static layer. Comparisons now separate full-disc, partial-disc and disc-weighted sunlight. Earth line of sight is geometric and is not a communication guarantee. See the [acceptance report](docs/MILESTONE5_ACCEPTANCE.md).
 
+## Explainable mission-date recommendation (Milestone 6)
+
+The **Mission Window Finder** separates hard requirements (sunlight, Earth visibility, darkness, blackout and, on the 5 m sites, a terrain footprint) from soft preferences (weights). Every ranked window shows its score breakdown. Sites without processed terrain are marked insufficient data rather than passing. The search and its results download as a reproducible JSON scenario. See the [acceptance report](docs/MILESTONE6_ACCEPTANCE.md).
+
 ## Development repository and milestone recovery
 
 The complete current development project is now maintained in [Muxsinjon/new_luna](https://github.com/Muxsinjon/new_luna). The original `Muxsinjon/lunawindow` repository is retained unchanged. All application source, scientific assets, tests and pipeline scripts are at this repository's root; this is not just an archive repository.
 
-Milestones 1–5 have [separate recovery files](milestones/README.md) and separate acceptance reports in `docs/`. The historical Milestone 1 backup ZIP and its checksum remain at the root; its old README is preserved in `docs/archive/NEW_LUNA_BACKUP_README.md`.
+Milestones 1–6 have [separate recovery files](milestones/README.md) and separate acceptance reports in `docs/`. The historical Milestone 1 backup ZIP and its checksum remain at the root; its old README is preserved in `docs/archive/NEW_LUNA_BACKUP_README.md`.
 
 See [migration and development setup](docs/NEW_LUNA_MIGRATION.md) for audited contents and future Codex/Claude sessions. GitHub Pages deployment is manual-only; normal pushes do not deploy the site.

@@ -13,9 +13,25 @@ describe('shared mission state in the URL', () => {
       mode: 'explore' as const,
       tz: 'local' as const,
       vis: 'geometric' as const,
-      req: { minSunPct: 40, minEarthPct: 70, minJointPct: 25, maxDarkH: 12, maxBlackoutH: 6 },
+      req: {
+        minSunPct: 40,
+        minEarthPct: 70,
+        minJointPct: 25,
+        maxDarkH: 12,
+        maxBlackoutH: 6,
+        terrain: { maxSlopeDeg: 12, maxRoughM: 0.25, radiusM: 150, minMeetsPct: 80 },
+      },
+      weights: { sun: 1, earth: 2, joint: 0, dark: 0.5, blackout: 3, terrain: 1 },
     }
     expect(fromHash(toHash(s))).toEqual(s)
+  })
+  it('keeps old links valid: missing terrain/weights fall back, invalid values are ignored (Milestone 6)', () => {
+    const old = fromHash('#ws=finder&rs=40&re=70&rd=12&rb=6')
+    expect(old.req.terrain).toBeNull()
+    expect(old.weights).toEqual(DEFAULT_STATE.weights)
+    expect(fromHash('#tr=5,0.2,1,90').req.terrain).toBeNull() // radius below 5 m
+    expect(fromHash('#w=1,1,1,1,1,-1').weights).toEqual(DEFAULT_STATE.weights)
+    expect(fromHash('#tr=').req.terrain).toBeNull()
   })
   it('keeps the optional joint requirement switched off', () => {
     expect(fromHash(toHash(DEFAULT_STATE)).req.minJointPct).toBeNull()

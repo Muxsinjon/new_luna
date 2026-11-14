@@ -1,5 +1,5 @@
 // One shared mission state for every workspace, mirrored in the URL (pure helpers, unit-tested).
-import { DEFAULT_REQ, type Requirements } from './finder'
+import { DEFAULT_REQ, DEFAULT_WEIGHTS, type Requirements, type Weights } from './finder'
 import type { TimeZoneMode } from './format'
 import type { Mode } from './prefs'
 import type { VisModel } from './visibility'
@@ -19,6 +19,8 @@ export interface MissionState {
   searchStart: number
   searchEnd: number
   req: Requirements
+  /** Mission Window Finder soft preferences (Milestone 6) */
+  weights: Weights
   ws: Workspace
   mode: Mode
   tz: TimeZoneMode
@@ -40,6 +42,7 @@ export const DEFAULT_STATE: MissionState = {
   searchStart: Date.parse('2026-11-14T00:00:00Z'),
   searchEnd: Date.parse('2027-02-14T00:00:00Z'),
   req: DEFAULT_REQ,
+  weights: DEFAULT_WEIGHTS,
   ws: 'home',
   mode: 'planner',
   tz: 'utc',
@@ -74,11 +77,42 @@ export function toHash(s: MissionState): string {
     rj: s.req.minJointPct === null ? '' : String(s.req.minJointPct),
     rd: String(s.req.maxDarkH),
     rb: String(s.req.maxBlackoutH),
+    tr: s.req.terrain
+      ? [s.req.terrain.maxSlopeDeg, s.req.terrain.maxRoughM, s.req.terrain.radiusM, s.req.terrain.minMeetsPct].join(',')
+      : '',
+    w: [s.weights.sun, s.weights.earth, s.weights.joint, s.weights.dark, s.weights.blackout, s.weights.terrain].join(','),
     mode: s.mode,
     tz: s.tz,
     vis: s.vis,
   })
   return `#${p.toString()}`
+}
+
+/** "slope,rough,radius,minPct" (all finite, in range) or '' for no terrain requirement. */
+function parseTerrain(v: string | null, base: Requirements['terrain']): Requirements['terrain'] {
+  if (v === null) return base ?? null
+  if (v === '') return null
+  const x = v.split(',').map(Number)
+  const ok =
+    x.length === 4 &&
+    x.every(Number.isFinite) &&
+    x[0] >= 0 &&
+    x[0] <= 90 &&
+    x[1] >= 0 &&
+    x[1] <= 100 &&
+    x[2] >= 5 &&
+    x[2] <= 2000 &&
+    x[3] >= 0 &&
+    x[3] <= 100
+  return ok ? { maxSlopeDeg: x[0], maxRoughM: x[1], radiusM: x[2], minMeetsPct: x[3] } : (base ?? null)
+}
+
+/** Six non-negative weights (sun, earth, joint, dark, blackout, terrain), each at most 10. */
+function parseWeights(v: string | null, base: Weights): Weights {
+  if (!v) return base
+  const x = v.split(',').map(Number)
+  if (x.length !== 6 || !x.every((n) => Number.isFinite(n) && n >= 0 && n <= 10)) return base
+  return { sun: x[0], earth: x[1], joint: x[2], dark: x[3], blackout: x[4], terrain: x[5] }
 }
 
 /** Parse a hash into a full state, falling back to `base` for anything missing or invalid. */
@@ -102,7 +136,9 @@ export function fromHash(hash: string, base: MissionState = DEFAULT_STATE): Miss
       minJointPct: rj === '' ? null : (num(rj, 0, 100) ?? base.req.minJointPct),
       maxDarkH: num(p.get('rd'), 0, 2000) ?? base.req.maxDarkH,
       maxBlackoutH: num(p.get('rb'), 0, 2000) ?? base.req.maxBlackoutH,
+      terrain: parseTerrain(p.get('tr'), base.req.terrain ?? null),
     },
+    weights: parseWeights(p.get('w'), base.weights),
     ws: ws && WORKSPACES.includes(ws) ? ws : base.ws,
     mode: p.get('mode') === 'explore' ? 'explore' : p.get('mode') === 'planner' ? 'planner' : base.mode,
     tz: p.get('tz') === 'local' ? 'local' : p.get('tz') === 'utc' ? 'utc' : base.tz,

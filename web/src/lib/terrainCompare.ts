@@ -3,6 +3,7 @@
 import { classify, criteriaValid, footprint, valuesAtIndex, type Criteria, type HazardData } from './hazardAnalysis'
 import { polarXY } from './terrain'
 import type { TerrainAsset } from './terrainMesh'
+import type { TerrainScreen } from './finder'
 
 export const SLOPE_BINS = [0, 5, 10, 15, 20, 30, 90] as const
 
@@ -221,3 +222,28 @@ export const classifyIndex = (hz: HazardData, i: number, c: Criteria) => {
   const v = valuesAtIndex(hz, i)
   return classify(v.slope, v.roughness, c)
 }
+
+/**
+ * Milestone 6: finder terrain screen from an equal-footprint measurement. Any unavailable sample in the footprint
+ * makes the terrain unknown (never a pass); only processed 5 m sites can be screened.
+ */
+export function terrainScreenFrom(d: FootprintDetail | null, product: string, siteName: string): TerrainScreen {
+  if (!d)
+    return { meetsPct: null, reason: `The terrain footprint at ${siteName} could not be evaluated (radius must be 5–2000 m).`, product }
+  if (d.valid < d.total || d.meetsPct === null)
+    return {
+      meetsPct: null,
+      reason: `Only ${d.valid} of ${d.total} native 5 m samples in the ${d.radiusM} m footprint at ${siteName} have data (${d.coveragePct.toFixed(1)} % coverage).`,
+      product,
+    }
+  return {
+    meetsPct: d.meetsPct,
+    reason: `${d.meetsPct.toFixed(1)} % of ${d.valid} native 5 m samples meet both limits (NASA PGDA ${product}).`,
+    product,
+  }
+}
+
+export const NO_TERRAIN = (siteName: string): TerrainScreen => ({
+  meetsPct: null,
+  reason: `No processed 5 m terrain covers ${siteName}, so slope and roughness are unknown there (terrain from other sites is never reused).`,
+})
