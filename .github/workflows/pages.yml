@@ -1,8 +1,7 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [main]
+  # Manual only: importing the project must not deploy the website.
   workflow_dispatch:
 
 permissions:

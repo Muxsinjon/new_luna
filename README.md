@@ -171,3 +171,11 @@ Final Milestone 1 results: [acceptance report](docs/MILESTONE1_ACCEPTANCE.md).
 ## Scientific terrain screening (Milestone 2)
 
 Within **3D Terrain**, select a location and use **Scientific terrain analysis** to view slope, detrended RMS roughness and threshold-based hazard overlays. Configure slope/RMS requirements and a circular footprint to inspect sample-based coverage and min/mean/max statistics. Native 5 m data drives science; the 20 m mesh is display geometry only. This screens selected terrain criteria, not all landing hazards. See [acceptance and limitations](docs/MILESTONE2_ACCEPTANCE.md) and [data inventory](docs/DATA_SOURCES.md).
+
+## Development repository and milestone recovery
+
+The complete current development project is now maintained in [Muxsinjon/new_luna](https://github.com/Muxsinjon/new_luna). The original `Muxsinjon/lunawindow` repository is retained unchanged. All application source, scientific assets, tests and pipeline scripts are at this repository's root; this is not just an archive repository.
+
+Milestone 1 and Milestone 2 have [separate recovery files](milestones/README.md) and separate acceptance reports in `docs/`. The historical Milestone 1 backup ZIP and its checksum remain at the root; its old README is preserved in `docs/archive/NEW_LUNA_BACKUP_README.md`.
+
+See [migration and development setup](docs/NEW_LUNA_MIGRATION.md) for audited contents and future Codex/Claude sessions. GitHub Pages deployment is manual-only; normal pushes do not deploy the site.
