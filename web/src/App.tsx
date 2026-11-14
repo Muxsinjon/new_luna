@@ -17,6 +17,7 @@ const loaders = {
   compare: () => import('./workspaces/ExploreCompare'),
   finder: () => import('./workspaces/MissionFinder'),
   surface: () => import('./workspaces/SurfaceView'),
+  terrain: () => import('./workspaces/TerrainExplorer'),
 }
 // Start fetching the workspace the URL asks for in parallel with the data, instead of after it.
 {
@@ -28,6 +29,7 @@ const Welcome = lazy(loaders.home)
 const ExploreCompare = lazy(loaders.compare)
 const MissionFinder = lazy(loaders.finder)
 const SurfaceView = lazy(loaders.surface)
+const TerrainExplorer = lazy(loaders.terrain)
 const About = lazy(() => import('./components/About'))
 const MissionSummary = lazy(() => import('./components/MissionSummary'))
 const Demo = lazy(() => import('./components/Demo'))
@@ -240,6 +242,7 @@ function Shell({ data, theme, setTheme }: { data: AppData; theme: Theme; setThem
     compare: 'Explore and Compare',
     finder: 'The Mission Window Finder',
     surface: 'Surface View',
+    terrain: '3D terrain explorer',
     about: 'The methodology page',
   }
 
@@ -271,6 +274,8 @@ function Shell({ data, theme, setTheme }: { data: AppData; theme: Theme; setThem
                   <ExploreCompare />
                 ) : s.ws === 'finder' ? (
                   <MissionFinder />
+                ) : s.ws === 'terrain' ? (
+                  <TerrainExplorer />
                 ) : s.ws === 'surface' ? (
                   <SurfaceView />
                 ) : (

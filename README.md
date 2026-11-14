@@ -159,3 +159,9 @@ _Add team member names and roles here._
 
 ## License
 MIT for the code ([LICENSE](LICENSE)). The NASA data is public domain; please cite the sources above.
+
+## 3D lunar terrain explorer
+
+The **3D Terrain** workspace provides a real Three.js terrain mesh from NASA PGDA's Connecting Ridge **Site01 5 m LOLA DEM**, with rotation, zoom, pan, surface-point selection and lunar coordinate/elevation/RMS readouts linked to Site A/B. The browser uses a documented 20 m mesh over 8 × 8 km. Optional real LROC WAC imagery is projected onto that terrain as coarse context; independent landmark co-registration has not been measured.
+
+Existing mission planning, comparisons, astronomical calculations and 360° Surface View are preserved. See [project status](docs/PROJECT_STATUS.md) and [verified sources, processing and tests](docs/TERRAIN_3D.md) for source uncertainty, decimation error, image limitations and local review commands.

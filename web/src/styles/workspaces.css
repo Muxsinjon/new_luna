@@ -830,3 +830,36 @@ dialog.summary::backdrop {
     display: none !important;
   }
 }
+
+.terrain-canvas {
+  width: 100%;
+  height: clamp(320px, 55vh, 640px);
+  overflow: hidden;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-lg);
+  background: var(--c-sky-night);
+}
+.terrain-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.terrain-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  align-items: end;
+  margin-block: var(--s-3);
+}
+.terrain-quality {
+  padding: var(--s-3);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-sm);
+}
+.terrain-hash {
+  overflow-wrap: anywhere;
+}
+.terrain-ws .stage {
+  min-width: 0;
+}

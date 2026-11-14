@@ -10,6 +10,7 @@ const NAV: [Workspace, string][] = [
   ['compare', 'Explore & Compare'],
   ['finder', 'Mission Window Finder'],
   ['surface', 'Surface View'],
+  ['terrain', '3D Terrain'],
   ['about', 'About & methodology'],
 ]
 

@@ -105,6 +105,9 @@ export default function SurfaceView() {
           </div>
         </div>
         <SiteFacts site={st} slot={s.surfaceSite} />
+        <button className="btn" type="button" onClick={() => set({ ws: 'terrain' })}>
+          Open 3D terrain explorer
+        </button>
         <TimeBar />
 
         <div className="sv-tools">

@@ -4,8 +4,8 @@ import type { TimeZoneMode } from './format'
 import type { Mode } from './prefs'
 import type { VisModel } from './visibility'
 
-export type Workspace = 'home' | 'compare' | 'finder' | 'surface' | 'about'
-export const WORKSPACES: Workspace[] = ['home', 'compare', 'finder', 'surface', 'about']
+export type Workspace = 'home' | 'compare' | 'finder' | 'surface' | 'terrain' | 'about'
+export const WORKSPACES: Workspace[] = ['home', 'compare', 'finder', 'surface', 'terrain', 'about']
 export const DURATIONS = [1, 3, 7, 14, 30] as const
 
 export interface MissionState {
