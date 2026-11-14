@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { localToSurface, surfaceToLocal, meshArrays, type SurfacePoint, type TerrainAsset } from '../lib/terrainMesh'
+import type { HazardVisual } from './HazardPanel'
+import { polarXY, polarLatLon } from '../lib/terrain'
+import { sampleGrid } from '../lib/terrainMesh'
 import { cssVar } from '../lib/theme'
 
 type Action = 'reset' | 'in' | 'out' | 'rotate' | 'pan'
@@ -12,17 +15,20 @@ export default function TerrainCanvas({
   imagery,
   theme,
   onPick,
+  visual,
 }: {
   asset: TerrainAsset
   site: SurfacePoint
   selectedPoint: SurfacePoint | null
   imagery: boolean
   theme: string
+  visual: HazardVisual | null
   onPick: (p: SurfacePoint) => void
 }) {
   const host = useRef<HTMLDivElement>(null),
     action = useRef<(a: Action) => void>(() => {}),
     select = useRef<(p: SurfacePoint | null) => void>(() => {})
+  const updateVisual = useRef<(v: HazardVisual | null) => void>(() => {})
   const pick = useRef(onPick),
     [error, setError] = useState('')
   useEffect(() => {
@@ -59,7 +65,7 @@ export default function TerrainCanvas({
     geometry.setIndex(new THREE.BufferAttribute(arrays.indices, 1))
     geometry.computeVertexNormals()
     const material = new THREE.MeshStandardMaterial({ color: cssVar('--c-terrain-edge'), roughness: 1, side: THREE.DoubleSide })
-    const mesh = new THREE.Mesh(geometry, material)
+    const mesh = new THREE.Mesh<THREE.BufferGeometry, THREE.Material>(geometry, material)
     scene.add(mesh)
     scene.add(new THREE.AmbientLight(cssVar('--c-site-a'), 1))
     const light = new THREE.DirectionalLight(cssVar('--c-site-a'), 2)
@@ -82,7 +88,45 @@ export default function TerrainCanvas({
     const selected = new THREE.Mesh(dotGeometry, pointMaterial)
     selected.visible = false
     scene.add(selected)
-    const render = () => renderer.render(scene, camera)
+    const overlayMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide })
+    const boundaryGeometry = new THREE.BufferGeometry()
+    const boundaryMaterial = new THREE.LineBasicMaterial({ color: cssVar('--c-accent'), depthTest: false })
+    const boundaryLine = new THREE.LineSegments(boundaryGeometry, boundaryMaterial)
+    boundaryLine.renderOrder = 10
+    scene.add(boundaryLine)
+    const render = () => {
+      canvas.dataset.camera = JSON.stringify([...camera.position.toArray(), ...controls.target.toArray()])
+      renderer.render(scene, camera)
+    }
+    updateVisual.current = (v) => {
+      if (v?.texture) {
+        overlayMaterial.map = v.texture
+        overlayMaterial.needsUpdate = true
+        mesh.material = overlayMaterial
+      } else mesh.material = material
+      canvas.dataset.analysisLayer = v?.layer ?? 'elevation'
+      const positions: number[] = []
+      if (v?.footprint) {
+        const { point, radius } = v.footprint,
+          center = polarXY(point.lat, point.lon)
+        const at = (i: number) => {
+          const ll = polarLatLon(
+            center.x + radius * Math.cos((i * 2 * Math.PI) / 128),
+            center.y + radius * Math.sin((i * 2 * Math.PI) / 128),
+          )
+          const h = sampleGrid(asset, ll.lat, ll.lon)
+          return h === null ? null : surfaceToLocal({ ...ll, elevationM: h + 3 }, arrays.origin)
+        }
+        for (let i = 0; i < 128; i++) {
+          const a = at(i),
+            b = at(i + 1)
+          if (a && b) positions.push(...a, ...b)
+        }
+      }
+      boundaryGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+      boundaryGeometry.computeBoundingSphere()
+      render()
+    }
     select.current = (p) => {
       selected.visible = !!p
       if (p) selected.position.set(...surfaceToLocal(p, arrays.origin))
@@ -172,6 +216,10 @@ export default function TerrainCanvas({
     canvas.addEventListener('webglcontextlost', lost)
     render()
     return () => {
+      updateVisual.current = () => {}
+      overlayMaterial.dispose()
+      boundaryGeometry.dispose()
+      boundaryMaterial.dispose()
       disposed = true
       action.current = () => {}
       select.current = () => {}
@@ -193,6 +241,9 @@ export default function TerrainCanvas({
   useEffect(() => {
     select.current(selectedPoint)
   }, [asset, site, theme, imagery, selectedPoint])
+  useEffect(() => {
+    updateVisual.current(visual)
+  }, [visual, asset, site, theme, imagery])
   return (
     <>
       <div className="terrain-toolbar">

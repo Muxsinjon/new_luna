@@ -167,3 +167,7 @@ The **3D Terrain** workspace provides a real Three.js terrain mesh from NASA PGD
 Existing mission planning, comparisons, astronomical calculations and 360° Surface View are preserved. See [project status](docs/PROJECT_STATUS.md) and [verified sources, processing and tests](docs/TERRAIN_3D.md) for source uncertainty, decimation error, image limitations and local review commands.
 
 Final Milestone 1 results: [acceptance report](docs/MILESTONE1_ACCEPTANCE.md).
+
+## Scientific terrain screening (Milestone 2)
+
+Within **3D Terrain**, select a location and use **Scientific terrain analysis** to view slope, detrended RMS roughness and threshold-based hazard overlays. Configure slope/RMS requirements and a circular footprint to inspect sample-based coverage and min/mean/max statistics. Native 5 m data drives science; the 20 m mesh is display geometry only. This screens selected terrain criteria, not all landing hazards. See [acceptance and limitations](docs/MILESTONE2_ACCEPTANCE.md) and [data inventory](docs/DATA_SOURCES.md).

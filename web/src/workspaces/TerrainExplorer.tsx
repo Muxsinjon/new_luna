@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import HazardPanel, { type HazardVisual } from '../components/HazardPanel'
 import SitePair from '../components/SitePair'
 import TerrainCanvas from '../components/TerrainCanvas'
 import { useStore } from '../lib/store'
@@ -14,6 +15,7 @@ export default function TerrainExplorer() {
     [lon, setLon] = useState(''),
     [pickError, setPickError] = useState(''),
     [imagery, setImagery] = useState(false)
+  const [visual, setVisual] = useState<HazardVisual | null>(null)
   const st = site(s.surfaceSite === 'A' ? s.siteA : s.siteB)
   useEffect(() => {
     const abort = new AbortController()
@@ -136,6 +138,7 @@ export default function TerrainExplorer() {
                 imagery={imagery}
                 theme={theme}
                 onPick={pick}
+                visual={visual}
               />
             ) : (
               <div className="panel">
@@ -214,6 +217,7 @@ export default function TerrainExplorer() {
                 regional DEM over 250 km, not this local mesh.
               </p>
             </section>
+            <HazardPanel asset={asset} point={picked} theme={theme} onVisual={setVisual} />
             <details className="panel">
               <summary>Sources, uncertainty and image alignment</summary>
               <p>

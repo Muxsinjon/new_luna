@@ -1,8 +1,21 @@
 # LunaWindow project status
 
-Updated 2026-11-14. Local branch: `feat/connecting-ridge-3d`. No GitHub push, remote PR, publication or merge. Milestone 2 has not started.
+Updated 2026-11-14. Local branch: `feat/site01-hazard-analysis`, based on preserved `aeb54a6`. No GitHub push, remote PR, publication or merge. Milestone 2 completed locally; Milestone 3 has not started.
 
-## Milestone 1 final acceptance
+## Milestone 2 — completed locally
+
+The existing 3D explorer now has native-resolution source-derived slope, roughness and configurable hazard overlays, point measurements, thresholds and circular footprint statistics. Geometry and camera are preserved across analysis layer changes. No remote updates, PRs or deployment were performed.
+
+- **Source science:** verified existing 5 m Site01 DEM; 3×3 OLS slope (nominal 15 m support), 5×5 detrended residual RMS (25 m support). The 20 m mesh remains rendering only. NASA's compatible Site01 slope raster was downloaded/verified for comparison; existing height RMS is retained.
+- **Suitability correction:** directory product 98 currently describes north-pole roughness; south-pole regional metrics have different definitions/baselines and are not substituted for local 25 m roughness.
+- **Screening:** illustrative configurable maximum slope/RMS, three explicit states, point exceedance reasons, 5 m sample-centre circular footprint with min/mean/max values, fraction meeting criteria and unavailable coverage. Missing data never imply favorable terrain.
+- **Validation:** 73 JS tests, 11 Python tests (no skips), lint, format, build, existing smoke and terrain suites, and new scientific browser checks pass. Browser-vs-raster point differences: 0.000473904° slope / 0.000314077 m RMS; independent 100 m disk count matches 1260 samples. All footprint summary differences are ≤0.0005 in their units.
+- **Comparison caveat:** independent OLS reference agrees below 1e-9, but NASA supplied slope differs by 0.505067° RMS / 15.244853° maximum. The numerical stencil/support is not established by its README; exact official-product equivalence is not claimed.
+- **Limits:** source DEM is ~90% interpolated; roughness can be comparable to source height error. No propagated confidence intervals, boulder/crater detection, dynamics/bearing-capacity verification or safety certification. Thresholds act on values rounded at 0.001° / 0.001 m. Footprint coverage is sample-based; analysis controls are not added to mission URLs.
+
+See [Milestone 2 acceptance](MILESTONE2_ACCEPTANCE.md), [structured data inventory](DATA_SOURCES.md), and [numerical browser evidence](data/MILESTONE2_BROWSER_VALIDATION.json). Source downloads and full-precision scientific GeoTIFFs stay ignored; reproducible processing is `pipeline/hazard_site01.py`.
+
+## Milestone 1 final acceptance (preserved baseline)
 
 **Core terrain explorer accepted for local review, with WAC registration explicitly unverified and disabled by default.** Full evidence for every acceptance requirement is in [MILESTONE1_ACCEPTANCE.md](MILESTONE1_ACCEPTANCE.md).
 
