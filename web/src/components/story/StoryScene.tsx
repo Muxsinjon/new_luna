@@ -7,6 +7,7 @@ import { vectorsAt } from '../../lib/analysis'
 import type { Ephemeris } from '../../lib/data'
 import { unitVec, type Vec3 } from '../../lib/geometry'
 import { cssVar } from '../../lib/theme'
+import { makeEarth, makeSun } from './bodies'
 
 const BASE = import.meta.env.BASE_URL + 'textures/'
 /** MOON_ME (x lon 0, y lon 90° E, z north) -> three.js sphere frame (Y up, lon 0 at +X, lon 90° E at −Z) */
@@ -123,38 +124,12 @@ export default function StoryScene({
       }),
     )
     scene.add(moon)
-    const earth = new THREE.Mesh(
-      new THREE.SphereGeometry(EARTH_R, 96, 48),
-      new THREE.MeshStandardMaterial({ map: load('earth.jpg'), roughness: 0.85, metalness: 0 }),
-    )
+    const earthBody = makeEarth(EARTH_R)
+    const earth = earthBody.group
     scene.add(earth)
-    const atmo = new THREE.Mesh(
-      new THREE.SphereGeometry(EARTH_R * 1.03, 64, 32),
-      new THREE.MeshBasicMaterial({ color: cssVar('--c-earth'), transparent: true, opacity: 0.12, side: THREE.BackSide }),
-    )
-    earth.add(atmo)
-    const sun = new THREE.Mesh(new THREE.CircleGeometry(1, 64), new THREE.MeshBasicMaterial({ map: load('sun.jpg'), transparent: true }))
+    const sunBody = makeSun()
+    const sun = sunBody.group
     scene.add(sun)
-    // soft glow around the Sun (display aid; the disc itself is the SDO image)
-    const gc = document.createElement('canvas')
-    gc.width = gc.height = 128
-    const g2 = gc.getContext('2d')!
-    const grad = g2.createRadialGradient(64, 64, 0, 64, 64, 64)
-    grad.addColorStop(0, cssVar('--c-sun'))
-    grad.addColorStop(1, 'transparent')
-    g2.fillStyle = grad
-    g2.fillRect(0, 0, 128, 128)
-    const glow = new THREE.Sprite(
-      new THREE.SpriteMaterial({
-        map: new THREE.CanvasTexture(gc),
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        opacity: 0.55,
-        transparent: true,
-      }),
-    )
-    glow.scale.setScalar(260)
-    scene.add(glow)
     const light = new THREE.DirectionalLight(0xffffff, 3.2)
     scene.add(light)
     scene.add(new THREE.AmbientLight(0xffffff, 0.035))
@@ -192,8 +167,9 @@ export default function StoryScene({
       const ed = toThree(ev).normalize()
       light.position.copy(sd).multiplyScalar(100)
       sun.position.copy(sd).multiplyScalar(900)
-      sun.scale.setScalar(900 * Math.tan((0.2666 * 5 * Math.PI) / 180)) // drawn 5× true size for visibility
+      sun.scale.setScalar(900 * Math.tan((0.2666 * 4 * Math.PI) / 180)) // disc drawn 4× true size for visibility
       sun.lookAt(0, 0, 0)
+      earthBody.setSun(sd)
       earth.position.copy(ed).multiplyScalar(EARTH_DIST)
       earth.rotation.y = (t / 86_164_100) * 2 * Math.PI // sidereal spin (illustrative)
       starRig.rotation.y = Math.atan2(-sd.z, sd.x) // keeps the star field consistent with the Sun direction
@@ -217,7 +193,6 @@ export default function StoryScene({
       camera.lookAt(camTgt)
       const ps = Math.min(1, Math.max(0.06, (alt - 1) / 1.6))
       for (const m of pinMeshes) m.scale.setScalar(ps)
-      glow.position.copy(sun.position)
       renderer.render(scene, camera)
     }
     tick()
@@ -233,6 +208,8 @@ export default function StoryScene({
         mat?.bumpMap?.dispose()
         mat?.dispose?.()
       })
+      earthBody.dispose()
+      sunBody.dispose()
       renderer.dispose()
       renderer.domElement.remove()
     }

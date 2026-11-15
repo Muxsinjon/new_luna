@@ -61,7 +61,7 @@ with sync_playwright() as pw:
 
     sun_rgb = page.evaluate("() => getComputedStyle(document.documentElement).getPropertyValue('--c-sun').trim()")
     tgt = [int(sun_rgb[k:k + 2], 16) for k in (1, 3, 5)]
-    close = lambda c: sum(abs(c[k] - tgt[k]) for k in range(3)) < 60
+    close = lambda c: max(c[:3]) > 150  # the drawn Sun (white-hot disc and glare) is far brighter than any terrain pixel
     frac, el, rgb = sun_pixel('shackleton-rim-site04', '2027-01-05T12:00:00Z')
     assert el > 0 and frac == 0, (el, frac)
     assert not close(rgb), ('Sun drawn although terrain hides it', rgb)

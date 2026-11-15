@@ -9,6 +9,7 @@ import { lookVector, type CameraFrame } from '../lib/firstPerson'
 import { meshArrays, type TerrainAsset } from '../lib/terrainMesh'
 import type { FarField } from '../lib/terrainShadow'
 import { cssVar } from '../lib/theme'
+import { makeEarth, makeSun, texture } from './story/bodies'
 
 export interface Bodies {
   /** mesh-frame unit directions from the camera */
@@ -125,9 +126,19 @@ export default function FirstPersonView({
     scene.add(sunLight, sunLight.target)
     // display aid only (not earthshine or scattering): keeps shadowed ground faintly visible
     scene.add(new THREE.AmbientLight(0xffffff, 0.05))
-    const sun = new THREE.Mesh(new THREE.CircleGeometry(1, 48), new THREE.MeshBasicMaterial({ color: cssVar('--c-sun') }))
-    const earth = new THREE.Mesh(new THREE.SphereGeometry(1, 48, 24), new THREE.MeshLambertMaterial({ color: cssVar('--c-earth') }))
+    // realistic bodies (NASA SDO Sun, Blue Marble / Black Marble Earth) and the real star map, faint
+    const sunBody = makeSun('eye'),
+      earthBody = makeEarth(1)
+    const sun = sunBody.group,
+      earth = earthBody.group
     scene.add(sun, earth)
+    const starTex = texture('stars.jpg')
+    const sky = new THREE.Mesh(
+      new THREE.SphereGeometry(250_000, 48, 24),
+      new THREE.MeshBasicMaterial({ map: starTex, side: THREE.BackSide, color: 0x555555, depthWrite: false }),
+    )
+    sky.rotation.x = (-23.44 * Math.PI) / 180
+    scene.add(sky)
     const rig = new THREE.Group()
     const camera = new THREE.PerspectiveCamera(60, 1, 0.05, 300_000)
     rig.add(camera)
@@ -175,6 +186,8 @@ export default function FirstPersonView({
       place(sun, b.sun, b.sunRadiusDeg)
       place(earth, b.earth, b.earthRadiusDeg)
       sunLight.position.set(f.pos[0] + b.sun[0] * 1000, f.pos[1] + b.sun[1] * 1000, f.pos[2] + b.sun[2] * 1000)
+      earthBody.setSun(new THREE.Vector3(...b.sun))
+      sky.position.set(...f.pos)
       sunLight.target.position.set(...f.pos)
       render()
     }
@@ -273,10 +286,10 @@ export default function FirstPersonView({
       terrainMat.dispose()
       ringGeom.dispose()
       ringMat.dispose()
-      for (const o of [sun, earth]) {
-        o.geometry.dispose()
-        ;(o.material as THREE.Material).dispose()
-      }
+      sunBody.dispose()
+      earthBody.dispose()
+      starTex.dispose()
+      sky.geometry.dispose()
       renderer.dispose()
       canvas.remove()
     }

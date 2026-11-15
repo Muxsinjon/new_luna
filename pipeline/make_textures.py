@@ -24,6 +24,8 @@ SOURCES = {
                   'NASA SVS Deep Star Maps 2020 (Hipparcos-2 and Tycho-2 catalogues), svs.gsfc.nasa.gov/4851'),
     'earth.jpg': (f'{SVS}/a002900/a002915/bluemarble-2048.png', (2048, 1024),
                   'NASA SVS Blue Marble seamless mosaic of the Earth, svs.gsfc.nasa.gov/2915'),
+    'earth_night.jpg': ('https://svs.gsfc.nasa.gov/vis/a030000/a030000/a030028/earthatnight2012_print.jpg', (2048, 1024),
+                        'NASA Earth Observatory / SVS Black Marble 2012 (Suomi NPP VIIRS city lights), svs.gsfc.nasa.gov/30028'),
     'sun.jpg': ('https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304.jpg', (1024, 1024),
                 'NASA/SDO and the AIA science team (AIA 304 Å, retrieved image)'),
 }

@@ -12,6 +12,7 @@ Updated 2026-11-14. Reference directory: user-supplied `Lunar_Landing_Navigator_
 | moon_height.jpg (1024 × 512) | SVS 4720 `ldem_3_8bit.jpg` | NASA SVS CGI Moon Kit (LRO LOLA) |
 | earth.jpg (2048 × 1024) | SVS 2915 `bluemarble-2048.png` | NASA Blue Marble |
 | stars.jpg (2048 × 1024) | SVS 4851 `hiptyc_2020_4k_print.jpg` | NASA SVS Deep Star Maps (Hipparcos-2, Tycho-2) |
+| earth_night.jpg (2048 × 1024) | SVS 30028 `earthatnight2012_print.jpg` | NASA Black Marble 2012 (Suomi NPP VIIRS) |
 | sun.jpg (1024 × 1024) | SDO `latest_1024_0304.jpg` (2026-11-15) | NASA/SDO and the AIA science team |
 
 ## Milestone 8 science overlay records
