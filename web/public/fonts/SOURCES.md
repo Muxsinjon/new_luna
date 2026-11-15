@@ -12,3 +12,9 @@ Licenses: [Barlow](OFL-Barlow.txt), [Barlow Semi Condensed](OFL-BarlowSemiConden
   SHA-256: `c15439e7a03af5714282ec1780ff7b0214ec6a7db96300b54928dbcd2569ca0c`
 - `barlow-semi-condensed-600.ttf`: https://fonts.gstatic.com/s/barlowsemicondensed/v16/wlpigxjLBV1hqnzfr-F8sEYMB0Yybp0mudRfp66PAA.ttf
   SHA-256: `cb75439ae401f77624d5b268ea25fd7556e34803fccbd2f92e937a4f3856a1da`
+
+## Unbounded (display headings, redesign 2026-11-15)
+
+Unbounded by NORD ID, SIL Open Font License 1.1 ([OFL-Unbounded.txt](OFL-Unbounded.txt), from `google/fonts` `ofl/unbounded`). Unmodified binary fetched over verified HTTPS from Google Fonts.
+- `unbounded-500.ttf`: https://fonts.gstatic.com/s/unbounded/v12/Yq6F-LOTXCb04q32xlpat-6uR42XTqtG6yrx040.ttf
+  SHA-256: `7ac0baee243b4d54ea0282ceb7e017a455f064462989620720215727e1b9129c`

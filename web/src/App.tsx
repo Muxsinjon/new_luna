@@ -1,4 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react'
+import GuideStrip from './components/GuideStrip'
 import type { AppData, Site, Terrain } from './lib/data'
 import { loadCore, loadTerrain } from './lib/data'
 import { fmtLat, fmtLon, fmtTime } from './lib/format'
@@ -269,6 +270,7 @@ function Shell({ data, theme, setTheme }: { data: AppData; theme: Theme; setThem
           <LanePatterns />
           <Header />
           <main id="view" tabIndex={-1}>
+            <GuideStrip ws={s.ws} />
             <ErrorBoundary key={s.ws} label={label[s.ws]}>
               <Suspense
                 fallback={

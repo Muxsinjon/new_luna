@@ -27,3 +27,11 @@
   font-display: swap;
   src: url('./barlow-semi-condensed-600.ttf') format('truetype');
 }
+/* Unbounded by NORD ID, SIL OFL 1.1 (OFL-Unbounded.txt). Display headings only. */
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./unbounded-500.ttf') format('truetype');
+}

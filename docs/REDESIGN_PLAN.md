@@ -79,3 +79,8 @@ A sticky full-screen 3D scene; scrolling drives the camera and time.
    - Run `npm test && npm run lint && npm run build`.
    - Run `python tests/e2e/smoke_test.py http://localhost:4173/` and `python tests/e2e/journey_test.py http://localhost:4173/` (the journey test refreshes the demo screenshots).
    - Push, then GitHub → Actions → "Deploy to GitHub Pages" → Run workflow.
+- **Realism and inside design (2026-11-15):**
+  - Earth shader with Blue Marble day and Black Marble night lights, ocean glint and atmosphere rim. Sun as the SDO disc with glow in the story, and a white-hot disc in Surface View (how the Sun looks from the Moon).
+  - Real stars in Surface View.
+  - Palette: moonlight accent `#e9e2d0` (Sun gold and Earth blue keep their meanings), warm text, and the Unbounded display face (self-hosted, OFL) for titles.
+  - A 3-step plain-language guide (`GuideStrip.tsx`) on Compare, Finder, Surface and Terrain, which users can hide.

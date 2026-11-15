@@ -6,9 +6,10 @@
   --c-raised: #131b2e;
   --c-line: #22304a;
   --c-line-soft: #161f33;
-  --c-text: #e8edf5;
-  --c-text-muted: #9ba7ba;
-  --c-accent: #22d3ee;
+  --c-text: #ece8df;
+  --c-text-muted: #a3a097;
+  /* moonlight: the photographic Moon's warm off-white; Sun gold and Earth blue keep their meanings */
+  --c-accent: #e9e2d0;
   --c-site-a: #f4f1ea;
   --c-site-b: #e08ac8;
   --c-sun: #f0a830;
@@ -28,8 +29,8 @@
   --c-sky-night: #05070b;
   --c-grid: rgb(232 237 245 / 0.08);
   --c-grid-strong: rgb(232 237 245 / 0.3);
-  --c-focus: #22d3ee;
-  --c-on-primary: #0d1220;
+  --c-focus: #e9e2d0;
+  --c-on-primary: #0b0d12;
   --c-shimmer: rgb(255 255 255 / 0.05);
   --e-1: 0 6px 24px rgb(0 0 0 / 0.35);
   color-scheme: dark;
@@ -73,6 +74,8 @@
 :root {
   --font-ui: 'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-display: 'Barlow Semi Condensed', 'Barlow', system-ui, sans-serif;
+  /* wide geometric display face for page titles and the story (self-hosted, OFL) */
+  --font-hero: 'Unbounded', 'Barlow Semi Condensed', system-ui, sans-serif;
 
   /* type scale, minor third, base 16 */
   --fs-0: 12px;
