@@ -196,6 +196,17 @@ function Shell({ data, theme, setTheme }: { data: AppData; theme: Theme; setThem
     return () => window.removeEventListener('hashchange', on)
   }, [data, s])
 
+  // Redesign: long explanatory notes are clamped to two lines; a click expands or collapses them (full text stays in the DOM)
+  useEffect(() => {
+    const on = (e: MouseEvent) => {
+      const t = e.target as HTMLElement
+      if (t.closest('a, button, input, select, label, summary')) return
+      t.closest('.hint')?.classList.toggle('open')
+    }
+    document.addEventListener('click', on)
+    return () => document.removeEventListener('click', on)
+  }, [])
+
   // keyboard: ←/→ one hour, Shift+←/→ one day (Explore & Compare, Surface View; never while typing)
   useEffect(() => {
     if (s.ws !== 'compare' && s.ws !== 'surface') return

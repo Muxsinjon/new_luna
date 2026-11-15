@@ -1064,3 +1064,29 @@ dialog.summary::backdrop {
     animation: none;
   }
 }
+
+/* Redesign: calmer screens. Long notes show two lines; click to read the rest. */
+.hint {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  cursor: zoom-in;
+  transition: color var(--t-base, 0.2s) var(--ease, ease);
+}
+.hint:hover {
+  color: var(--c-text);
+}
+.hint.open {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  cursor: zoom-out;
+}
+@media print {
+  .hint {
+    display: block;
+    -webkit-line-clamp: unset;
+  }
+}

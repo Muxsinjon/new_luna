@@ -44,8 +44,8 @@ A sticky full-screen 3D scene; scrolling drives the camera and time.
 - [x] 2. `web/src/components/story/StoryScene.tsx`: Three.js scene (stars, Moon, Earth, Sun) with a scroll-driven camera and time (lazy-loaded); verify crater and continent orientation (Mare Crisium dark at 17° N 59° E; Africa facing the correct way)
 - [x] 3. `Welcome.tsx` replaced by the story sections + CTA cards; remove dense text
 - [x] 4. Visual system: deeper space palette, glass cards, display type scale, subtle nav; check light-mode contrast still passes
-- [ ] 5. Smooth motion: eased scroll (lerp), section fade-ins, reduced-motion fallback; 60 fps on a laptop, no layout shift
-- [ ] 6. Trim dense copy in workspaces (Explain-mode text stays; Planner mode shows numbers only); shorten About to essentials plus links
+- [x] 5. Smooth motion: eased scroll (lerp), section fade-ins, reduced-motion fallback; 60 fps on a laptop, no layout shift
+- [~] 6. Trim dense copy in workspaces (Explain-mode text stays; Planner mode shows numbers only); shorten About to essentials plus links
 - [x] 7. Update e2e tests for the new welcome (`smoke_test.py` welcome step, `journey_test.py` step 1)
 - [ ] 8. Screenshots plus mobile check; push; optionally re-run the Pages deploy (Actions → "Deploy to GitHub Pages" → Run workflow)
 
@@ -64,3 +64,18 @@ A sticky full-screen 3D scene; scrolling drives the camera and time.
   - Distances are compressed (Earth at 28 Moon radii), and the Sun disc is drawn at 5× size.
   - The star field is aligned with the ecliptic and rotated to match the Sun direction (about ±2°, approximate).
 - **Tests:** `smoke_test.py` and `journey_test.py` now expect the "Launching to the Moon" heading, and smoke ignores the headless-renderer "GPU stall" driver notice.
+- **Dense text (step 6, partial):** every `.hint` note is clamped to two lines and expands on click (`App.tsx` listener plus `workspaces.css`). Screen readers still get the full text.
+
+## Next steps for the next assistant (in order)
+
+1. **Shorten the About page** (`web/src/components/About.tsx`) to five short blocks: what it does, data sources (one line each), how accurate, limits, links to `docs/`. Keep every numeric claim that the tests check (`2031-12-31 18:00 UTC`, "not a radio link budget").
+2. **Story polish:**
+   - On phones (< 600 px) put the story cards at the bottom of the screen so the 3D scene stays visible.
+   - Add a scroll hint to the hero.
+   - Optionally show the Earth's terminator glow and a faint lunar-limb glow.
+3. **Workspace headers:** one sentence each; move long explanations into the collapsible notes or Explain mode.
+4. **Fonts (optional):** a self-hosted display face (OFL, e.g. Space Grotesk or Sora) for headings, added to `web/public/fonts/` with its licence and SHA-256 like Barlow. No external font requests (the journey test blocks them).
+5. **Verify and ship:**
+   - Run `npm test && npm run lint && npm run build`.
+   - Run `python tests/e2e/smoke_test.py http://localhost:4173/` and `python tests/e2e/journey_test.py http://localhost:4173/` (the journey test refreshes the demo screenshots).
+   - Push, then GitHub → Actions → "Deploy to GitHub Pages" → Run workflow.
