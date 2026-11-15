@@ -38,10 +38,11 @@ Status on 2026-11-15:
 - [x] Long notes collapsed to 2 lines (click to expand)
 - [x] 3-step beginner guide on Compare, Finder, Surface and Terrain (hideable)
 - [x] **Simple view by default**: expert settings hidden until "Show all controls" (URL `ui=simple|full`)
+- [x] **South pole map lit by the real Sun** (shadow march per 960 m cell, play slider) and **plain-word Surface View** (Sun/Earth cards, whole-sky panorama on a fixed −5° to 15° scale). Ideas from astoreyai/lunar-lighting-planner (`lib/lightMap.ts`, `lib/siteDigest.ts`, `components/{SkyPanorama,SiteCards}.tsx`)
 - [x] **"What blocks the Sun and Earth"** (idea from comparing with team Kestro Aerospace): the blocking ridge, its direction and distance, and the hours lost
 
 ### Quality (last run 2026-11-15)
-- [x] 133 unit tests (`npm test`), 34 Python tests
+- [x] 140 unit tests (`npm test`), 34 Python tests
 - [x] Browser suites pass: smoke (11/11), journey (offline), terrain, hazard, compare, astronomy, lighting, finder, surface 3D, science, no-GPU
 - [x] `tsc`, ESLint, Prettier and build are clean; no console errors
 
@@ -59,6 +60,8 @@ Status on 2026-11-15:
 - [ ] **One-sentence header per tool page:** move long explanations into the collapsible notes or the expert view.
 - [ ] **Surface View terrain look** (optional): the ground is flat grey. Do **not** invent craters: any texture must be real NASA imagery with verified registration. LROC WAC registration is unverified, so it stays off.
 - [ ] Optional: show the blocking ridge in the 3D views (a highlight at the azimuth and distance from `lib/blockers.ts`).
+
+- [ ] Optional ideas still open from astoreyai/lunar-lighting-planner: a closer map zoom (96 km around the site on the 240 m grid), "Why a short move changes everything" (lowest nearby ground vs the site), CSV export of the hourly mission.
 
 ### Science extensions (optional)
 - [ ] Uncertainty bands on sunrise and sunset from terrain height error (Kestro does this)

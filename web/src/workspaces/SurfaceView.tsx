@@ -1,10 +1,13 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { loadTerrainIndex, terrainSiteFor, type TerrainIndex } from '../lib/terrainMesh'
-import { type Sample, SUN_RADIUS_DEG, makeCtx, sampleAt, vectorsAt } from '../lib/analysis'
+import { type Sample, SUN_RADIUS_DEG, makeCtx, nextEvent, sampleAt, series, vectorsAt } from '../lib/analysis'
+import { siteDigest } from '../lib/siteDigest'
+import SiteCards from '../components/SiteCards'
+import SkyPanorama from '../components/SkyPanorama'
 import { fmtAz, fmtDeg, fmtPct, fmtTime } from '../lib/format'
 import { horizonAt } from '../lib/geometry'
 import { earthPhase } from '../lib/physics/earthPhase'
-import { useStore } from '../lib/store'
+import { DAY, useStore } from '../lib/store'
 import { MODEL_LABEL, signal } from '../lib/visibility'
 import { reason } from '../lib/explain'
 import { SiteFacts } from '../components/SitePair'
@@ -35,6 +38,12 @@ export default function SurfaceView() {
   const terrainInfo = terrainIdx ? terrainSiteFor(terrainIdx.sites, st.id, st.lat, st.lon) : null
   const show3d = s.surface3d && !!terrainInfo
   const now = useMemo(() => sampleAt(ctx, data.eph, s.selectedTime), [ctx, data, s.selectedTime])
+  const ahead = useMemo(() => series(ctx, data.eph, s.selectedTime, s.selectedTime + 30 * DAY), [ctx, data, s.selectedTime])
+  const digest = useMemo(() => siteDigest(ahead, s.vis), [ahead, s.vis])
+  const path = useMemo(() => ahead.filter((_, i) => i % 3 === 0), [ahead])
+  const sunEv = useMemo(() => nextEvent(ctx, data.eph, s.selectedTime, 'sun', s.vis), [ctx, data, s.selectedTime, s.vis])
+  const earthEv = useMemo(() => nextEvent(ctx, data.eph, s.selectedTime, 'earth', s.vis), [ctx, data, s.selectedTime, s.vis])
+  const [lookAround, setLookAround] = useState(false)
   const [view, setView] = useState({ az: now.sunAz, el: 5 })
   const [fov, setFov] = useState(90)
   const [ex, setEx] = useState(1)
@@ -95,8 +104,8 @@ export default function SurfaceView() {
       <section className="stage wide" aria-labelledby="sv-title">
         <div className="stage-head">
           <div>
-            <h2 id="sv-title">Surface view</h2>
-            <p className="lede">What an observer 2 m above the ground would see, using the same calculated angles as the charts.</p>
+            <h2 id="sv-title">Standing at {st.name}</h2>
+            <p className="lede">What you would see from 2 m above the ground, at {fmtTime(s.selectedTime, s.tz)}.</p>
             <p className="model-label">{MODEL_LABEL[s.vis]}</p>
           </div>
           <div className="actions">
@@ -119,21 +128,39 @@ export default function SurfaceView() {
             </button>
           </div>
         </div>
-        <SiteFacts site={st} slot={s.surfaceSite} />
-        <button className="btn" type="button" onClick={() => set({ ws: 'terrain' })}>
-          Open 3D terrain explorer
-        </button>
+        <div className="adv">
+          <SiteFacts site={st} slot={s.surfaceSite} />
+          <button className="btn" type="button" onClick={() => set({ ws: 'terrain' })}>
+            Open 3D terrain explorer
+          </button>
+        </div>
         <TimeBar />
+        <SiteCards d={digest} sunEv={sunEv} earthEv={earthEv} t={s.selectedTime} />
 
-        <div className="seg" role="radiogroup" aria-label="Surface view mode">
+        <div className="seg seg-wrap" role="radiogroup" aria-label="Surface view mode">
           <button
             type="button"
             role="radio"
-            aria-checked={!show3d}
-            className={!show3d ? 'on' : ''}
-            onClick={() => set({ surface3d: false })}
+            aria-checked={!show3d && !lookAround}
+            className={!show3d && !lookAround ? 'on' : ''}
+            onClick={() => {
+              setLookAround(false)
+              set({ surface3d: false })
+            }}
           >
-            360° horizon panorama
+            Whole sky
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={!show3d && lookAround}
+            className={!show3d && lookAround ? 'on' : ''}
+            onClick={() => {
+              setLookAround(true)
+              set({ surface3d: false })
+            }}
+          >
+            Look around
           </button>
           <button
             type="button"
@@ -156,6 +183,8 @@ export default function SurfaceView() {
           <Suspense fallback={<p role="status">Loading the first-person view…</p>}>
             <SurfaceFirstPerson site={st} slot={s.surfaceSite} info={terrainInfo} />
           </Suspense>
+        ) : !lookAround ? (
+          <SkyPanorama horizon={st.horizon} step={data.sites.azStepDeg} now={now} path={path} vis={s.vis} siteName={st.name} />
         ) : (
           <>
             <div className="sv-tools">

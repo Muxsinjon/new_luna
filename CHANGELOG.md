@@ -2,6 +2,11 @@
 
 All dates 2026 (UTC+local event time). Each milestone has an acceptance report in `docs/` and a recovery patch in `milestones/`.
 
+## Simpler map and Surface View (2026-11-15)
+Ideas adapted (no code copied) from astoreyai/lunar-lighting-planner, an independent project:
+- **South pole map, lit by the real Sun:** every 960 m LOLA cell is marched toward the Sun (or Earth) at the selected time, with exact spherical geometry and the upper-limb rule. Warm ground is sunlit and dark ground is in shadow. A play button and slider move through the mission. The year-average PGDA layers remain in the expert view.
+- **Surface View in plain words:** four cards (Sun now, Earth now with countdowns to the hour, sunlight and longest night over the next 30 days, Earth always/sometimes/never). A whole-sky 360° panorama on a fixed −5° to 15° scale shows the Sun's and Earth's paths. The drag-to-look view and the 3D first-person view are kept as "Look around" and "3D first person".
+
 ## Milestone 9: release gate (2026-11-15)
 - **Full user-journey e2e on real data with every external request blocked** (`tests/e2e/journey_test.py`): it also produces the demo evidence screenshots. The app makes no runtime requests to external servers.
 - **Accessibility audit** from Chrome's computed accessibility tree on every workspace.

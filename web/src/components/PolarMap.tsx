@@ -1,4 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { vectorsAt } from '../lib/analysis'
+import { fmtTime } from '../lib/format'
+import { lightMap, type LightMap } from '../lib/lightMap'
+import { HOUR, missionEnd, useStore } from '../lib/store'
 import type { Site, Terrain } from '../lib/data'
 import { loadTerrain } from '../lib/data'
 import { INFO } from '../lib/glossary'
@@ -17,7 +21,14 @@ interface Props {
   onSelect: (id: string, slot: 'A' | 'B') => void
 }
 
-type Layer = 'sun' | 'earth' | 'terrain'
+type Layer = 'now-sun' | 'now-earth' | 'sun' | 'earth' | 'terrain'
+const LAYER_LABEL: Record<Layer, string> = {
+  'now-sun': 'Sunlight now',
+  'now-earth': 'Earth in view now',
+  sun: 'Sunlight, year average',
+  earth: 'Earth view, year average',
+  terrain: 'Terrain only',
+}
 const EXTENTS = { '80° S': -80, '85° S': -85, '88° S': -88 } as const
 type Extent = keyof typeof EXTENTS
 
@@ -26,7 +37,13 @@ export default function PolarMap({ sites, siteA, siteB, theme, onPick, onSelect 
   const [terrain, setTerrain] = useState<Terrain | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [requested, setRequested] = useState(false)
-  const [layer, setLayer] = useState<Layer>('sun')
+  const [layer, setLayer] = useState<Layer>('now-sun')
+  const store = useStore()
+  const { s, set, data } = store
+  const t = s.selectedTime
+  const [playing, setPlaying] = useState(false)
+  const [computed, setLight] = useState<{ key: Layer; m: LightMap } | null>(null)
+  const light = computed && computed.key === layer ? computed.m : null
   const [extent, setExtent] = useState<Extent>('85° S')
   const canvas = useRef<HTMLCanvasElement>(null)
 
@@ -73,11 +90,36 @@ export default function PolarMap({ sites, siteA, siteB, theme, onPick, onSelect 
       for (let c = 1; c < n - 1; c++) {
         const dx = (h[r * n + c + 1] - h[r * n + c - 1]) / (2 * scaleM)
         const dy = (h[(r - 1) * n + c] - h[(r + 1) * n + c]) / (2 * scaleM)
-        const s = 0.55 + (0.9 * (-dx * 0.7 + dy * 0.7)) / Math.sqrt(1 + dx * dx + dy * dy)
-        out[r * n + c] = Math.max(0, Math.min(1.2, s))
+        const v = 0.55 + (0.9 * (-dx * 0.7 + dy * 0.7)) / Math.sqrt(1 + dx * dx + dy * dy)
+        out[r * n + c] = Math.max(0, Math.min(1.2, v))
       }
     return out
   }, [terrain, n, scaleM])
+
+  // light right now: march every cell toward the real Sun (or Earth) on the LOLA grid, off the main input path
+  useEffect(() => {
+    if (!terrain || (layer !== 'now-sun' && layer !== 'now-earth')) return
+    const id = window.setTimeout(() => {
+      const v = vectorsAt(data.eph, t)
+      const g = { h: terrain.polar.h, n, scaleM, offsetPx }
+      setLight({
+        key: layer,
+        m: lightMap(g, halfPx, layer === 'now-sun' ? { kind: 'sun', dir: v.sun } : { kind: 'earth', posKm: v.earth }),
+      })
+    }, 30)
+    return () => window.clearTimeout(id)
+  }, [terrain, layer, t, data.eph, n, scaleM, offsetPx, halfPx])
+
+  // play: step the selected time through the mission, 6 h per frame
+  useEffect(() => {
+    if (!playing) return
+    const id = window.setInterval(() => {
+      const t1 = missionEnd(s)
+      const next = s.selectedTime + 6 * HOUR
+      set({ selectedTime: next > t1 ? s.missionStart : next })
+    }, 450)
+    return () => window.clearInterval(id)
+  }, [playing, s, set])
 
   useEffect(() => {
     const cv = canvas.current
@@ -88,9 +130,10 @@ export default function PolarMap({ sites, siteA, siteB, theme, onPick, onSelect 
     if (!ctx) return
     const img = ctx.createImageData(size, size)
     const c0 = Math.round(offsetPx - halfPx)
-    const ov = layer === 'terrain' ? null : terrain.pgda?.[layer]
+    const ov = layer === 'sun' || layer === 'earth' ? terrain.pgda?.[layer] : null
+    const litC = hexToRgb(cssVar('--c-terrain-top'))
     const lowC = hexToRgb(cssVar('--c-sky-night'))
-    const hiC = hexToRgb(cssVar(layer === 'earth' ? '--c-earth' : '--c-sun'))
+    const hiC = hexToRgb(cssVar(layer === 'earth' || layer === 'now-earth' ? '--c-earth' : '--c-sun'))
     const grey = hexToRgb(cssVar('--c-terrain-edge'))
     for (let r = 0; r < size; r++)
       for (let c = 0; c < size; c++) {
@@ -98,13 +141,19 @@ export default function PolarMap({ sites, siteA, siteB, theme, onPick, onSelect 
         const cc = c0 + c
         const k = (r * size + c) * 4
         if (rr < 0 || cc < 0 || rr >= n || cc >= n) continue
-        const s = shade[rr * n + cc]
-        let rgb = [grey[0] * s, grey[1] * s, grey[2] * s]
-        if (ov) {
+        const sh = shade[rr * n + cc]
+        let rgb = [grey[0] * sh, grey[1] * sh, grey[2] * sh]
+        if (light) {
+          const j = (rr - light.r0) * light.size + (cc - light.c0)
+          if (light.lit[j]) {
+            const l = 0.35 + 0.75 * light.shade[j]
+            rgb = [0, 1, 2].map((i) => (litC[i] * 0.55 + hiC[i] * 0.45) * l)
+          } else rgb = [0, 1, 2].map((i) => lowC[i] + grey[i] * sh * 0.16)
+        } else if (ov) {
           const v = ov[rr * n + cc]
           if (v !== 255) {
             const t = Math.pow(v / 100, 0.8)
-            const m = 0.45 + 0.55 * Math.min(1, s)
+            const m = 0.45 + 0.55 * Math.min(1, sh)
             rgb = [0, 1, 2].map((i) => (lowC[i] + (hiC[i] - lowC[i]) * t) * m)
           }
         }
@@ -114,7 +163,7 @@ export default function PolarMap({ sites, siteA, siteB, theme, onPick, onSelect 
         img.data[k + 3] = 255
       }
     ctx.putImageData(img, 0, 0)
-  }, [terrain, shade, layer, size, halfPx, offsetPx, n, theme])
+  }, [terrain, shade, layer, light, size, halfPx, offsetPx, n, theme])
 
   const toFrac = (lat: number, lon: number) => {
     const { x, y } = polarXY(lat, lon)
@@ -135,7 +184,7 @@ export default function PolarMap({ sites, siteA, siteB, theme, onPick, onSelect 
     <section ref={section} className="panel polarmap" aria-labelledby="map-title">
       <div className="panel-head">
         <h2 id="map-title" className="panel-title">
-          South pole map <InfoTip info={INFO.map} label="the south pole map" />
+          The south pole, lit by the real Sun <InfoTip info={INFO.map} label="the south pole map" />
         </h2>
         <select value={extent} onChange={(e) => setExtent(e.target.value as Extent)} aria-label="Map extent">
           {Object.keys(EXTENTS).map((k) => (
@@ -143,8 +192,13 @@ export default function PolarMap({ sites, siteA, siteB, theme, onPick, onSelect 
           ))}
         </select>
       </div>
+      <p className="map-lede">
+        {layer === 'now-earth'
+          ? 'Blue ground can see Earth at this moment. Dark ground has a ridge or the horizon in the way.'
+          : 'Warm ground is in sunlight at this moment. Dark ground is in shadow: real LOLA terrain blocks the low Sun.'}
+      </p>
       <div className="seg full" role="radiogroup" aria-label="Map layer">
-        {(['sun', 'earth', 'terrain'] as Layer[]).map((l) => (
+        {(['now-sun', 'now-earth'] as Layer[]).map((l) => (
           <button
             key={l}
             type="button"
@@ -153,11 +207,39 @@ export default function PolarMap({ sites, siteA, siteB, theme, onPick, onSelect 
             className={layer === l ? 'on' : ''}
             onClick={() => setLayer(l)}
           >
-            {l === 'sun' ? 'Sunlight' : l === 'earth' ? 'Earth view' : 'Terrain'}
+            {l === 'now-sun' ? 'Sunlight now' : 'Earth in view now'}
           </button>
         ))}
       </div>
-      <div className="row between">
+      <div className="row between map-time">
+        <button type="button" className="btn small" aria-pressed={playing} onClick={() => setPlaying((p) => !p)}>
+          {playing ? 'Pause' : 'Play the mission'}
+        </button>
+        <span className="small">{fmtTime(t, s.tz)}</span>
+      </div>
+      <input
+        type="range"
+        className="map-slider"
+        aria-label="Moment shown on the map"
+        min={s.missionStart}
+        max={missionEnd(s)}
+        step={HOUR}
+        value={Math.min(Math.max(t, s.missionStart), missionEnd(s))}
+        onChange={(e) => set({ selectedTime: Number(e.target.value) })}
+      />
+      <div className="adv">
+        <label className="small">
+          Other layers{' '}
+          <select value={layer} onChange={(e) => setLayer(e.target.value as Layer)} aria-label="Map layer (all)">
+            {(Object.keys(LAYER_LABEL) as Layer[]).map((l) => (
+              <option key={l} value={l}>
+                {LAYER_LABEL[l]}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div className="row between adv">
         <span className="hint">Clicking a pin or the map sets</span>
         <div className="seg" role="radiogroup" aria-label="Map click sets">
           {(['A', 'B'] as const).map((x) => (
@@ -218,15 +300,25 @@ export default function PolarMap({ sites, siteA, siteB, theme, onPick, onSelect 
           <span className="maplabel w">90° W</span>
         </div>
       )}
-      {layer !== 'terrain' && (
-        <div className="ramp" aria-hidden>
-          <span>0 %</span>
-          <span className={`ramp-bar ramp-${layer}`} />
-          <span>100 % of the time</span>
+      {light ? (
+        <div className="map-legend" aria-live="polite">
+          <span className={`key ${layer === 'now-earth' ? 'key-earth' : 'key-sun'}`} />
+          {layer === 'now-earth' ? 'Earth in view' : 'Sunlit'} <b>{Math.round(light.litPct)} %</b> of this map
+          <span className="key key-dark" />
+          {layer === 'now-earth' ? 'Earth hidden' : 'Shadow'}
         </div>
+      ) : (
+        (layer === 'sun' || layer === 'earth') && (
+          <div className="ramp" aria-hidden>
+            <span>0 %</span>
+            <span className={`ramp-bar ramp-${layer}`} />
+            <span>100 % of the time</span>
+          </div>
+        )
       )}
       <p className="hint">
-        Clicking an empty spot analyses those exact coordinates with LOLA terrain. A few hundred metres can change everything.
+        Click any spot to check it. A few hundred metres can move you from shadow into sunlight. Shadows: LOLA 960 m grid, upper limb of the
+        Sun, no atmosphere.
       </p>
     </section>
   )

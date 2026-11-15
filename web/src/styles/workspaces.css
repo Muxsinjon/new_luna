@@ -1193,3 +1193,179 @@ dialog.summary::backdrop {
 .blockers .dot.earth {
   background: var(--c-earth);
 }
+
+/* lit-terrain south pole map */
+.map-lede {
+  margin: 0 0 var(--s-2);
+  color: var(--c-text-muted);
+  font-size: var(--fs-1);
+}
+.map-time {
+  margin-top: var(--s-2);
+}
+.map-slider {
+  width: 100%;
+  accent-color: var(--c-sun);
+}
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-1) var(--s-2);
+  font-size: var(--fs-1);
+  color: var(--c-text-muted);
+  margin-top: var(--s-2);
+}
+.map-legend b {
+  color: var(--c-text);
+  margin-right: var(--s-2);
+}
+.map-legend .key {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.key-sun {
+  background: var(--c-sun);
+}
+.key-earth {
+  background: var(--c-earth);
+}
+.key-dark {
+  background: var(--c-sky-night);
+  border: 1px solid var(--c-line);
+}
+
+/* Surface View: plain-word site cards and the whole-sky panorama */
+.site-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--s-3);
+  margin: var(--s-3) 0;
+}
+.site-cards > .hint {
+  grid-column: 1 / -1;
+}
+.site-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+  padding: var(--s-3) var(--s-4);
+}
+.site-card h3 {
+  margin: 0;
+  font-size: var(--fs-1);
+  font-weight: 500;
+  color: var(--c-text-muted);
+}
+.site-card .big {
+  margin: var(--s-1) 0;
+  font-family: var(--font-hero);
+  font-size: var(--fs-4);
+  color: var(--c-text);
+}
+.site-card p {
+  margin: 0;
+  font-size: var(--fs-1);
+  color: var(--c-text-muted);
+}
+.site-card.on-sun {
+  border-color: var(--c-sun);
+  background: var(--c-sun-tint);
+}
+.site-card.on-sun .big {
+  color: var(--c-sun);
+}
+.site-card.on-earth {
+  border-color: var(--c-earth);
+  background: var(--c-earth-tint);
+}
+.site-card.on-earth .big {
+  color: var(--c-earth);
+}
+.sky-pano {
+  margin: var(--s-3) 0 0;
+}
+.sky-pano svg {
+  display: block;
+  border-radius: var(--r-md);
+  border: 1px solid var(--c-line);
+}
+.sky-pano figcaption {
+  margin-top: var(--s-2);
+  font-size: var(--fs-1);
+  color: var(--c-text-muted);
+}
+.sky-bg {
+  fill: var(--c-sky-night);
+}
+.sky-ground {
+  fill: var(--c-terrain-bottom);
+  stroke: var(--c-terrain-edge);
+  stroke-width: 1.2;
+}
+.sky-grid {
+  stroke: var(--c-line-soft);
+}
+.sky-zero {
+  stroke: var(--c-line);
+  stroke-dasharray: 5 5;
+}
+.sky-tick,
+.sky-compass {
+  fill: var(--c-text-muted);
+  font-size: 11px;
+  font-family: var(--font-ui);
+}
+.sky-compass {
+  fill: var(--c-text);
+  font-weight: 600;
+}
+.sky-path.sun {
+  fill: var(--c-sun);
+  opacity: 0.55;
+}
+.sky-path.earth {
+  fill: var(--c-earth);
+  opacity: 0.6;
+}
+.sky-path.off {
+  fill: var(--c-none);
+  opacity: 0.35;
+}
+.sky-sun {
+  fill: var(--c-sun);
+}
+.sky-earth {
+  fill: var(--c-earth);
+}
+.sky-ring {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+}
+.sky-ring.sun {
+  stroke: var(--c-sun);
+}
+.sky-ring.earth {
+  stroke: var(--c-earth);
+}
+.sky-label {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  paint-order: stroke;
+  stroke: var(--c-sky-night);
+  stroke-width: 3px;
+}
+.sky-label.sun {
+  fill: var(--c-sun);
+}
+.sky-label.earth {
+  fill: var(--c-earth);
+}
+.seg.seg-wrap {
+  flex-wrap: wrap;
+  max-width: 100%;
+}
