@@ -1,11 +1,11 @@
 /* "Terminator" design tokens: single source of truth. See docs/DESIGN_SYSTEM.md */
 :root,
 :root[data-theme='dark'] {
-  --c-bg: #0d1220;
-  --c-surface: #141b2b;
-  --c-raised: #1d2638;
-  --c-line: #2b3650;
-  --c-line-soft: #212a3d;
+  --c-bg: #05070d;
+  --c-surface: #0b1020;
+  --c-raised: #131b2e;
+  --c-line: #22304a;
+  --c-line-soft: #161f33;
   --c-text: #e8edf5;
   --c-text-muted: #9ba7ba;
   --c-accent: #22d3ee;

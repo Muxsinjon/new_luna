@@ -9,7 +9,11 @@ html {
 }
 body {
   margin: 0;
-  background: var(--c-bg);
+  /* deep-space backdrop: a faint accent glow over near-black (tokens only) */
+  background:
+    radial-gradient(1100px 520px at 85% -8%, color-mix(in srgb, var(--c-accent) 7%, transparent), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, color-mix(in srgb, var(--c-earth) 6%, transparent), transparent 60%), var(--c-bg);
+  background-attachment: fixed;
   color: var(--c-text);
   font-family: var(--font-ui);
   font-size: var(--fs-2);
@@ -229,8 +233,12 @@ input[type='range'] {
   grid-template-areas: 'brand controls' 'tabs tabs';
   gap: var(--s-3) var(--s-5);
   padding: var(--s-4) var(--s-5) 0;
-  border-bottom: 1px solid var(--c-line);
-  background: var(--c-surface);
+  border-bottom: 1px solid color-mix(in srgb, var(--c-line) 70%, transparent);
+  background: color-mix(in srgb, var(--c-surface) 72%, transparent);
+  backdrop-filter: blur(14px);
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 .brand {
   grid-area: brand;
@@ -326,8 +334,9 @@ main:focus {
   min-width: 0;
 }
 .panel {
-  background: var(--c-surface);
-  border: 1px solid var(--c-line);
+  background: color-mix(in srgb, var(--c-surface) 86%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c-line) 80%, transparent);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--c-text) 4%, transparent) inset;
   border-radius: var(--r-md);
   padding: var(--s-4);
   display: flex;

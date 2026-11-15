@@ -43,7 +43,7 @@ A sticky full-screen 3D scene; scrolling drives the camera and time.
 - [x] 1. NASA textures downloaded, resized and credited (`web/public/textures/`, `pipeline/make_textures.py`, `docs/DATA_SOURCES.md`)
 - [x] 2. `web/src/components/story/StoryScene.tsx`: Three.js scene (stars, Moon, Earth, Sun) with a scroll-driven camera and time (lazy-loaded); verify crater and continent orientation (Mare Crisium dark at 17° N 59° E; Africa facing the correct way)
 - [x] 3. `Welcome.tsx` replaced by the story sections + CTA cards; remove dense text
-- [ ] 4. Visual system: deeper space palette, glass cards, display type scale, subtle nav; check light-mode contrast still passes
+- [x] 4. Visual system: deeper space palette, glass cards, display type scale, subtle nav; check light-mode contrast still passes
 - [ ] 5. Smooth motion: eased scroll (lerp), section fade-ins, reduced-motion fallback; 60 fps on a laptop, no layout shift
 - [ ] 6. Trim dense copy in workspaces (Explain-mode text stays; Planner mode shows numbers only); shorten About to essentials plus links
 - [x] 7. Update e2e tests for the new welcome (`smoke_test.py` welcome step, `journey_test.py` step 1)
