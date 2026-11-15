@@ -2,6 +2,18 @@
 
 Updated 2026-11-14. Reference directory: user-supplied `Lunar_Landing_Navigator_NASA_JPL_Data_Sources.docx` (17 categories). That document is a discovery directory, not verification. Status below distinguishes existing integration, newly verified products and future/uninspected collections. No remote publication is implied.
 
+## Redesign imagery (story scene)
+
+`pipeline/make_textures.py` writes `web/public/textures/` (5 JPGs, about 1.5 MB). Each source URL, SHA-256 and credit is recorded in `textures.json`. These are display textures; tone adjustments are display-only, with no geometric change.
+
+| File | Source | Credit |
+|---|---|---|
+| moon_color.jpg (2048 × 1024) | SVS 4720 `lroc_color_poles_2k.tif` | NASA SVS CGI Moon Kit (LRO LROC WAC) |
+| moon_height.jpg (1024 × 512) | SVS 4720 `ldem_3_8bit.jpg` | NASA SVS CGI Moon Kit (LRO LOLA) |
+| earth.jpg (2048 × 1024) | SVS 2915 `bluemarble-2048.png` | NASA Blue Marble |
+| stars.jpg (2048 × 1024) | SVS 4851 `hiptyc_2020_4k_print.jpg` | NASA SVS Deep Star Maps (Hipparcos-2, Tycho-2) |
+| sun.jpg (1024 × 1024) | SDO `latest_1024_0304.jpg` (2026-11-15) | NASA/SDO and the AIA science team |
+
 ## Milestone 8 science overlay records
 
 | Record | Product / file | Use | Notes |

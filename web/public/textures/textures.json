@@ -1,0 +1,55 @@
+{
+ "generated": "2026-11-15T02:33:25+00:00",
+ "files": {
+  "moon_color.jpg": {
+   "source": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_poles_2k.tif",
+   "sourceSha256": "13b797422e8c4b8607ff2b2623ac3a046a6da0132d567c2d272d92fad7052c4a",
+   "size": [
+    2048,
+    1024
+   ],
+   "credit": "NASA SVS CGI Moon Kit (LRO LROC WAC colour mosaic, poles filled), svs.gsfc.nasa.gov/4720",
+   "bytes": 557279
+  },
+  "moon_height.jpg": {
+   "source": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/ldem_3_8bit.jpg",
+   "sourceSha256": "6d93f887e7d8bedfe35ab89ba785e5e3ca12381bd092a5e6abe2c707dda8bb98",
+   "size": [
+    1024,
+    512
+   ],
+   "credit": "NASA SVS CGI Moon Kit (LRO LOLA elevation, 8-bit), svs.gsfc.nasa.gov/4720",
+   "bytes": 98350
+  },
+  "stars.jpg": {
+   "source": "https://svs.gsfc.nasa.gov/vis/a000000/a004800/a004851/hiptyc_2020_4k_print.jpg",
+   "sourceSha256": "d80b41a47e4a12e5d4ffebb614e98215bf6cf99ab7705c93eac32dfdf82bc846",
+   "size": [
+    2048,
+    1024
+   ],
+   "credit": "NASA SVS Deep Star Maps 2020 (Hipparcos-2 and Tycho-2 catalogues), svs.gsfc.nasa.gov/4851",
+   "bytes": 408818
+  },
+  "earth.jpg": {
+   "source": "https://svs.gsfc.nasa.gov/vis/a000000/a002900/a002915/bluemarble-2048.png",
+   "sourceSha256": "ae6214b078ed0864c96f74bcb10ae3021f6eb116f8059797efe0fa9ea8b89d35",
+   "size": [
+    2048,
+    1024
+   ],
+   "credit": "NASA SVS Blue Marble seamless mosaic of the Earth, svs.gsfc.nasa.gov/2915",
+   "bytes": 237359
+  },
+  "sun.jpg": {
+   "source": "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304.jpg",
+   "sourceSha256": "4241c0af0e4938c9cc075282da7ced446369ddc477f0801a10f53759b0eef6be",
+   "size": [
+    1024,
+    1024
+   ],
+   "credit": "NASA/SDO and the AIA science team (AIA 304 \u00c5, retrieved image)",
+   "bytes": 160226
+  }
+ }
+}

@@ -40,7 +40,7 @@ A sticky full-screen 3D scene; scrolling drives the camera and time.
 ## Checklist (tick and push after each item)
 
 - [x] 0. This plan pushed
-- [ ] 1. NASA textures downloaded, resized and credited (`web/public/textures/`, `pipeline/make_textures.py`, `docs/DATA_SOURCES.md`)
+- [x] 1. NASA textures downloaded, resized and credited (`web/public/textures/`, `pipeline/make_textures.py`, `docs/DATA_SOURCES.md`)
 - [ ] 2. `web/src/components/story/MoonStory.tsx`: Three.js scene (stars, Moon, Earth, Sun) with a scroll-driven camera and time (lazy-loaded); verify crater and continent orientation (Mare Crisium dark at 17° N 59° E; Africa facing the correct way)
 - [ ] 3. `Welcome.tsx` replaced by the story sections + CTA cards; remove dense text
 - [ ] 4. Visual system: deeper space palette, glass cards, display type scale, subtle nav; check light-mode contrast still passes
