@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type * as THREE from 'three'
-import { analysisAt, classify, footprint, loadHazards, type AnalysisLayer, type Criteria, type HazardData } from '../lib/hazardAnalysis'
+import { analysisAt, classify, footprint, type AnalysisLayer, type Criteria, type HazardData } from '../lib/hazardAnalysis'
+import { loadSiteHazards } from '../lib/terrainCache'
 import { type SurfacePoint, type TerrainAsset } from '../lib/terrainMesh'
 import { hazardAligned, useHazardTexture, type HazardSettings } from './hazardTexture'
 import type { LightingLayer } from './lightingOverlay'
@@ -39,7 +40,7 @@ export default function HazardPanel({
     setRadius = (v: number) => onSettings({ radius: v })
   useEffect(() => {
     const a = new AbortController()
-    loadHazards(a.signal, siteId)
+    loadSiteHazards(siteId)
       .then((d) => {
         if (!hazardAligned(d, asset)) throw new Error('Scientific layer does not align with elevation source')
         if (!a.signal.aborted) setData(d)

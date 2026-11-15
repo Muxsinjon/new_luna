@@ -1,8 +1,26 @@
 # LunaWindow project status
 
-Updated 2026-11-15. Branch `milestone-8` on `Muxsinjon/new_luna`, based on Milestone 7 (`cd5afab`). Milestone 8 (optional) is complete and pushed; Milestone 9 has not started.
+Updated 2026-11-15. Branch `milestone-9` on `Muxsinjon/new_luna`, based on Milestone 8 (`1c0017d`). **All nine milestones have been worked through.**
+- Milestones 1–6 are complete.
+- Milestone 7 is complete on desktop; WebXR has not been tested on a headset.
+- Milestone 8 is partial by design (2 of 7 datasets integrated).
+- Milestone 9 (release gate) is complete.
 
-## Milestone 8: completed (optional science overlays)
+## Milestone 9: release gate
+
+- **Journey:** the full user journey passes on real data with all external requests blocked. Top recommendation: Nobile Rim 1 from 2027-01-07 00:00 UTC, meeting every requirement, score 0.749.
+- **Quality checks:** accessibility-tree audit, 390 px layout, no-WebGL fallback.
+- **Provenance and AI disclosure:** in every export and in page metadata; the share image carries a visible watermark.
+- **Rules:** checked against the official 2026 Project Submission Guide.
+- **Fixed:** repeated or cancelled 10 MB hazard downloads (shared session cache).
+- **Open team actions:**
+  - make the repository public or deploy it (it is private now);
+  - record the 30 s demo or make the 7 slides;
+  - fill in the submission form before 2026-11-15 23:59 local-event time.
+
+See [Milestone 9 acceptance](MILESTONE9_ACCEPTANCE.md), [demo script](DEMO_SCRIPT.md) and [submission kit](SUBMISSION.md).
+
+## Milestone 8: completed (preserved)
 
 - **Feasibility audit:** all seven candidates were checked over verified HTTPS.
 - **Integrated:**

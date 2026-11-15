@@ -19,7 +19,9 @@ It answers three questions:
 
 It is a preliminary tool and does not certify landing safety.
 
-**Live demo:** https://muxsinjon.github.io/lunawindow/ · **Source:** https://github.com/Muxsinjon/lunawindow
+**Current source (all milestones):** https://github.com/Muxsinjon/new_luna. The older public demo at https://muxsinjon.github.io/lunawindow/ shows the pre-milestone version (no 5 m terrain, first-person view or science layers) and is kept unchanged.
+
+**Final demo and release evidence:** [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) · [docs/MILESTONE9_ACCEPTANCE.md](docs/MILESTONE9_ACCEPTANCE.md) · [docs/SUBMISSION.md](docs/SUBMISSION.md) · [CHANGELOG.md](CHANGELOG.md)
 
 ## Workspaces (one shared mission state, in the URL)
 - **Welcome:** choose "Explore landing sites" or "Plan a lunar mission", or **Try the guided demo**, a 10-step walkthrough on real data.
@@ -97,9 +99,9 @@ flowchart LR
 ## Run locally
 ```bash
 cd web
-npm install
+npm ci
 npm run dev        # http://localhost:5173
-npm test           # 61 unit tests (physics, visibility models, finder, state, Horizons cross-check)
+npm test           # 127 unit tests (physics, terrain, hazards, shadows, finder, astronomy vs Horizons, state)
 npm run lint && npm run build
 ```
 
@@ -108,7 +110,9 @@ Playwright smoke tests (Python):
 pip install playwright && python -m playwright install chromium
 cd web && npx vite preview --port 4173 &
 python ../tests/e2e/smoke_test.py http://localhost:4173/
+python ../tests/e2e/journey_test.py http://localhost:4173/   # full release journey, offline, writes docs/screenshots/demo
 ```
+The other browser suites in `tests/e2e/` (terrain, hazard, compare, astronomy, lighting, finder, surface 3D, science, no-WebGL) use the same command. The terrain and science scripts need the pipeline environment (`pipeline/.venv`, numpy and rasterio).
 
 Rebuild the data (about 200 MB of NASA downloads into `pipeline/raw/`, which is gitignored):
 ```bash
@@ -126,7 +130,7 @@ python -m venv .venv && .venv/Scripts/pip install numpy requests rasterio pyproj
 The DEMs come from `http://imbrium.mit.edu/DATA/LOLA_GDR/` (`POLAR/IMG/LDEM_75S_240M.*`, `CYLINDRICAL/IMG/LDEM_16.*`). The illumination maps come from `https://pgda.gsfc.nasa.gov/data/MoonIllumination/` (`AVGVISIB_75S_120M_201608.TIF`, `..._EARTH.TIF`).
 
 ## Deploy
-Push to `main` and `.github/workflows/pages.yml` builds, tests and publishes to GitHub Pages. In the repo settings, set Pages to use GitHub Actions. `ci.yml` runs lint, format check, unit tests, build and the Playwright smoke tests on every push.
+`.github/workflows/pages.yml` builds, tests and publishes to GitHub Pages, but in `new_luna` it is **manual-only** (`workflow_dispatch`) so nothing is deployed without a decision. To publish, set Pages to use GitHub Actions in the repository settings, then run the workflow. The static build in `web/dist/` uses relative asset paths (`base: './'`), so any static host can serve it from any sub-path. `ci.yml` runs lint, format check, unit tests, build and the Playwright smoke tests.
 
 ## Tech stack
 TypeScript (strict), React 19 API (Preact runtime in production builds), hand-written SVG charts, Vite, Vitest, ESLint, Prettier, hand-written SVG and canvas charts, and Python (NumPy, rasterio, Playwright) for the data pipeline. Design system: [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
@@ -136,6 +140,10 @@ TypeScript (strict), React 19 API (Preact runtime in production builds), hand-wr
 - JPL Horizons System, DE441. https://ssd.jpl.nasa.gov/horizons/ (API retrieved 2026-11-14)
 - LRO LOLA Gridded Data Records LDEM_75S_240M and LDEM_16 (Smith et al., LOLA team), NASA PDS. http://imbrium.mit.edu/DATA/LOLA_GDR/
 - Mazarico, E., Neumann, G. A., Smith, D. E., Zuber, M. T., Torrence, M. H. (2011). Illumination conditions of the lunar polar regions using LOLA topography. *Icarus* 211, 1066–1081. Data: https://pgda.gsfc.nasa.gov/products/69
+- Barker, M. K. et al. (2021). Improved LOLA elevation maps for south pole landing sites. NASA GSFC PGDA product 78 (5 m site DEMs, slope, uncertainty): https://pgda.gsfc.nasa.gov/products/78
+- Barker, M. K. et al. A new view of the lunar south pole from LOLA. PGDA product 90 (LPSR permanently shadowed regions, 20 m): https://pgda.gsfc.nasa.gov/products/90
+- Paige, D. A. et al. (2010), Science 330; LRO Diviner Polar Resource Products, LRO-L-DLRE-5-PRP-V2.0, NASA PDS Geosciences
+- KPLO ShadowCam controlled mosaic shackleton01, ShadowCam PDS archive: https://pds.shadowcam.im-ldi.com/
 - LROC QuickMap (context and site checks): https://quickmap.lroc.asu.edu/
 - CSA Moon Exploration portal (Space Agency Partner resource): https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/
 
@@ -149,10 +157,10 @@ TypeScript (strict), React 19 API (Preact runtime in production builds), hand-wr
 - India TV News, 21 Sep 2023, on the 22 Sep wake-up attempt.
 
 **Software** (all open source): React, Preact, Vite, Vitest, TypeScript, ESLint, Prettier, Playwright, NumPy, rasterio, pyproj, requests. **Fonts:** Barlow and Barlow Semi Condensed (Jeremy Tribby, SIL OFL), self-hosted from Google Fonts; source hashes and licenses are in `web/public/fonts/`.
-**Images:** all original. The favicon and OG image are hand-coded SVG drawn from our own LOLA horizon data. No NASA logos or insignia are used, and no AI-generated images.
+**Images:** all original. The favicon and OG image are SVG drawn by code from our own LOLA horizon data; the code was written with AI assistance, and the OG image says so visibly. No NASA logos or insignia are used, and no image-generator output.
 
 ## Use of AI
-We used an AI coding assistant. Every task is logged in [docs/AI_USAGE.md](docs/AI_USAGE.md), as the Space Apps rules require.
+We used an AI coding assistant (Anthropic Claude) for code, tests, data-processing scripts and documentation, under the team's direction. The team chose the idea and approach. Every task is logged with dates and files in [docs/AI_USAGE.md](docs/AI_USAGE.md). The same disclosure is in machine-readable metadata: an `ai-assistance` meta tag in `web/index.html` and `provenance.aiDisclosure` in every exported JSON, as the 2026 Space Apps rules require. Scientific values are computed from NASA/JPL data by the documented pipeline and validated against independent references; they are not AI-generated.
 
 ## Team
 _Add team member names and roles here._
@@ -209,6 +217,6 @@ Each layer is labelled as a model or an observation, with units, coverage, sourc
 
 The complete current development project is now maintained in [Muxsinjon/new_luna](https://github.com/Muxsinjon/new_luna). The original `Muxsinjon/lunawindow` repository is retained unchanged. All application source, scientific assets, tests and pipeline scripts are at this repository's root; this is not just an archive repository.
 
-Milestones 1–8 have [separate recovery files](milestones/README.md) and separate acceptance reports in `docs/`. The historical Milestone 1 backup ZIP and its checksum remain at the root; its old README is preserved in `docs/archive/NEW_LUNA_BACKUP_README.md`.
+Milestones 1–9 have [separate recovery files](milestones/README.md) and separate acceptance reports in `docs/`. The historical Milestone 1 backup ZIP and its checksum remain at the root; its old README is preserved in `docs/archive/NEW_LUNA_BACKUP_README.md`.
 
 See [migration and development setup](docs/NEW_LUNA_MIGRATION.md) for audited contents and future Codex/Claude sessions. GitHub Pages deployment is manual-only; normal pushes do not deploy the site.

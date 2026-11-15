@@ -16,6 +16,7 @@ import {
 } from '../lib/finder'
 import type { Site } from '../lib/data'
 import { loadSiteLayers } from '../lib/terrainCache'
+import { PROVENANCE } from '../lib/provenance'
 import { footprintDetail, NO_TERRAIN, terrainScreenFrom } from '../lib/terrainCompare'
 import { loadTerrainIndex, sampleGrid, terrainSiteFor } from '../lib/terrainMesh'
 import { fmtHours, fmtPct, fmtTime, fromInputValue, toInputValue } from '../lib/format'
@@ -243,6 +244,7 @@ export default function MissionFinder() {
     runInfo &&
     downloadScenario({
       app: 'LunaWindow Mission Window Finder',
+      provenance: PROVENANCE,
       generatedUtc: new Date().toISOString(),
       link: window.location.href,
       inputs: {

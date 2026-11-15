@@ -1,3 +1,4 @@
+import { PROVENANCE } from '../lib/provenance'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { makeCtx, summarize } from '../lib/analysis'
 import { checkSentence, checksFor, metricsAt, prepare, statusFor, STATUS_LABEL } from '../lib/finder'
@@ -94,6 +95,7 @@ export default function MissionSummary({ ctx, onClose }: { ctx: SummaryContext; 
     const out = {
       generated: new Date().toISOString(),
       tool: 'LunaWindow (NASA Space Apps Challenge 2026)',
+      provenance: PROVENANCE,
       model: MODEL_LABEL[s.vis],
       sampling: 'hourly samples, half-open intervals, durations in whole hours',
       mission: { startUTC: new Date(content.t0).toISOString(), endUTC: new Date(content.t1).toISOString(), durationDays: s.durationDays },
@@ -109,6 +111,7 @@ export default function MissionSummary({ ctx, onClose }: { ctx: SummaryContext; 
         'NASA/JPL Horizons API (DE441)',
         'LRO LOLA LDEM_75S_240M and LDEM_16 (NASA PDS)',
         'PGDA lunar polar illumination (Mazarico et al. 2011)',
+        'Ephemeris coverage 2023-01-01 00:00 to 2031-12-31 18:00 UTC; no extrapolation',
       ],
       limitations: LIMITS,
     }

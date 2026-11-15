@@ -1,7 +1,7 @@
 """Render the Open Graph image (1200x630) and PNG favicons from hand-written SVG.
 
 Original artwork: the real LOLA horizon silhouette of Nobile Rim 2 with the Sun on the ridge.
-No agency logos, no AI-generated imagery. Requires `playwright` (Chromium).
+No agency logos and no image-generator output; the drawing code was written with AI assistance, which the image states visibly. Requires `playwright` (Chromium).
 """
 import json
 from pathlib import Path
@@ -53,7 +53,7 @@ p{{position:absolute;left:66px;top:136px;margin:0;font:400 28px Barlow;color:#a9
 </svg>
 <h1>LunaWindow</h1>
 <p>Find the right place and time to land on the Moon: sunlight and Earth visibility from JPL Horizons and real LRO LOLA terrain.</p>
-<div class="f">Real LOLA horizon of Nobile Rim 2 with the computed Sun and Earth, 2026-11-22 00:40 UTC (vertical scale exaggerated).</div>
+<div class="f">Real LOLA horizon of Nobile Rim 2 with the computed Sun and Earth, 2026-11-22 00:40 UTC (vertical scale exaggerated). Rendered by AI-assisted code; not a NASA image.</div>
 </body></html>"""
 
 icon = (PUB / "favicon.svg").read_text()
