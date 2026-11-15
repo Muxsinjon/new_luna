@@ -4,6 +4,7 @@ import HazardPanel, { type HazardVisual } from '../components/HazardPanel'
 import SitePair from '../components/SitePair'
 import SkyReadout from '../components/SkyReadout'
 import LightingPanel from '../components/LightingPanel'
+import SciencePanel, { useScience } from '../components/SciencePanel'
 import { useLightingOverlay, useSiteIllumination, type LightingLayer } from '../components/lightingOverlay'
 import TimeBar from '../components/TimeBar'
 import { bodyVectorsFromSite } from '../lib/analysis'
@@ -102,9 +103,15 @@ export default function TerrainExplorer() {
   )
   const illum = useSiteIllumination(lighting === 'off' || !info ? null : terrainId)
   const light = useLightingOverlay(shown, illum?.data ?? null, lighting, data.eph, s.selectedTime, theme)
+  const science = useScience(info ? terrainId : null, shown, theme)
   const shownVisual = useMemo<HazardVisual | null>(
-    () => (lighting === 'off' ? visual : { texture: light.texture, layer: lighting, footprint: visual?.footprint ?? null }),
-    [lighting, visual, light.texture],
+    () =>
+      science.texture
+        ? { texture: science.texture, layer: 'science', footprint: visual?.footprint ?? null }
+        : lighting === 'off'
+          ? visual
+          : { texture: light.texture, layer: lighting, footprint: visual?.footprint ?? null },
+    [lighting, visual, light.texture, science.texture],
   )
   const pick = (p: SurfacePoint) => {
     setPicked(p)
@@ -353,6 +360,7 @@ export default function TerrainExplorer() {
                 site={st}
               />
             )}
+            {current && <SciencePanel science={science} asset={shown} point={picked ?? current} />}
             <p className="hint">
               Drag to rotate, scroll or pinch to zoom, right drag or two fingers to pan. Focus the canvas and use arrow keys to pan, or use
               the camera buttons. Click terrain to select a point. Magenta marks the mission site; cyan marks your picked point. Local axes:

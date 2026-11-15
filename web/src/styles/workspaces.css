@@ -925,3 +925,17 @@ dialog.summary::backdrop {
 .fp-h-earth {
   fill: var(--c-earth);
 }
+
+/* Milestone 8: science layer legend */
+.sci-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-block: var(--s-2);
+}
+.sci-ramp {
+  flex: 1;
+  height: 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--c-line);
+}

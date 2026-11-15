@@ -185,8 +185,10 @@ function Shell({ data, theme, setTheme }: { data: AppData; theme: Theme; setThem
   }, [s])
   // state ← URL (edited or pasted links, back/forward)
   useEffect(() => {
-    const on = () => {
-      const r = clampToCoverage(fromHash(window.location.hash, s), data.eph.meta.startMs, data.eph.endMs)
+    // read the URL from the event: a pending state commit may already have rewritten location.hash (replaceState),
+    // which would silently undo an edited or pasted link
+    const on = (e: HashChangeEvent) => {
+      const r = clampToCoverage(fromHash(new URL(e.newURL).hash, s), data.eph.meta.startMs, data.eph.endMs)
       setS(r.state)
       setNotice(r.note)
     }

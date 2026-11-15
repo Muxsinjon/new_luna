@@ -197,10 +197,18 @@ At Connecting Ridge, Shackleton Rim and Nobile Rim 1, **Surface View → 3D firs
 
 Other sites keep the 360° horizon panorama. VR is offered only where the browser supports it. See the [acceptance report](docs/MILESTONE7_ACCEPTANCE.md).
 
+## Optional science layers (Milestone 8)
+
+In **3D Terrain**, "Science layers" can drape two kinds of layer over the 5 m sites:
+- NASA LRO Diviner polar products (model-derived annual temperatures and the depth at which water ice would be stable);
+- KPLO ShadowCam's observed image of Shackleton's permanently shadowed interior, where it exists.
+
+Each layer is labelled as a model or an observation, with units, coverage, source and caveats. Layers are context, never combined into a safety score. See the [acceptance report](docs/MILESTONE8_ACCEPTANCE.md).
+
 ## Development repository and milestone recovery
 
 The complete current development project is now maintained in [Muxsinjon/new_luna](https://github.com/Muxsinjon/new_luna). The original `Muxsinjon/lunawindow` repository is retained unchanged. All application source, scientific assets, tests and pipeline scripts are at this repository's root; this is not just an archive repository.
 
-Milestones 1–7 have [separate recovery files](milestones/README.md) and separate acceptance reports in `docs/`. The historical Milestone 1 backup ZIP and its checksum remain at the root; its old README is preserved in `docs/archive/NEW_LUNA_BACKUP_README.md`.
+Milestones 1–8 have [separate recovery files](milestones/README.md) and separate acceptance reports in `docs/`. The historical Milestone 1 backup ZIP and its checksum remain at the root; its old README is preserved in `docs/archive/NEW_LUNA_BACKUP_README.md`.
 
 See [migration and development setup](docs/NEW_LUNA_MIGRATION.md) for audited contents and future Codex/Claude sessions. GitHub Pages deployment is manual-only; normal pushes do not deploy the site.

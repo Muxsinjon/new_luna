@@ -2,6 +2,15 @@
 
 Updated 2026-11-14. Reference directory: user-supplied `Lunar_Landing_Navigator_NASA_JPL_Data_Sources.docx` (17 categories). That document is a discovery directory, not verification. Status below distinguishes existing integration, newly verified products and future/uninspected collections. No remote publication is implied.
 
+## Milestone 8 science overlay records
+
+| Record | Product / file | Use | Notes |
+|---|---|---|---|
+| Diviner Polar Resource Products | PDS Geosciences `urn:nasa:pds:lro_diviner_derived1:data_derived_prp:dlre_prp_south` (`LRO-L-DLRE-5-PRP-V2.0`), 604,800,210 bytes, SHA-256 `393deaa5d8925d45bb2ed608f937a824f5eae029c2558aad1d2da8206b83a62d` | model-derived annual maximum / average (2 cm) temperature and ice-stability depth on the 5 m sites | thermal-model fits to the first mapping year; Kaguya-DEM triangles about 0.5 km; −999 = deeper than 2.87 m; −1 undocumented (not interpreted) |
+| ShadowCam controlled mosaic shackleton01 | `derived/cmosaic/shackleton01/..._20m_cog.tif` (20 m, polar stereographic, R 1737.4 km) | observed I/F in the Shackleton permanent shadow (Site04 only) | window bytes hashed in `terrain/site04/science/index.json` |
+
+Deferred or rejected candidates and the reasons are listed in [MILESTONE8_ACCEPTANCE.md](MILESTONE8_ACCEPTANCE.md).
+
 ## Milestone 7 immersive view records
 
 No new downloads. The first-person view reuses:

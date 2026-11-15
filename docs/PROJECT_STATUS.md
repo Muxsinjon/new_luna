@@ -1,8 +1,21 @@
 # LunaWindow project status
 
-Updated 2026-11-15. Branch `milestone-7` on `Muxsinjon/new_luna`, based on Milestone 6 (`bdbd5cd`). Milestone 7 is complete and pushed; Milestones 8–9 have not started.
+Updated 2026-11-15. Branch `milestone-8` on `Muxsinjon/new_luna`, based on Milestone 7 (`cd5afab`). Milestone 8 (optional) is complete and pushed; Milestone 9 has not started.
 
-## Milestone 7: completed (desktop first, optional VR)
+## Milestone 8: completed (optional science overlays)
+
+- **Feasibility audit:** all seven candidates were checked over verified HTTPS.
+- **Integrated:**
+  - Diviner Polar Resource Products (model-derived temperatures and ice-stability depth) at all three 5 m sites;
+  - the ShadowCam controlled Shackleton mosaic (observed I/F) where it covers the crop.
+- **Deferred or rejected, with reasons:** UCLA L4 (TLS failure), ShadowCam DTMs, LEND, Mini-RF, M3 and CRaTER.
+- **Framework:** a reusable per-site layer framework with toggles, opacity, legend, model/observation labels, coded states (an undocumented −1 source code is shown but never interpreted), provenance hashes and caveats.
+- **Validation:** Diviner's maximum temperature is 87.6 K inside PGDA permanent shadow vs 279.5 K outside.
+- **Also fixed:** a real URL-hash race in `App.tsx` that caused intermittent navigation loss.
+
+See [Milestone 8 acceptance](MILESTONE8_ACCEPTANCE.md).
+
+## Milestone 7: completed (preserved)
 
 - **Verified existing:** the 360° horizon panorama, now also the fallback.
 - **Added:** a 3D first-person view on the three 5 m sites. It uses:

@@ -7,7 +7,7 @@ import type { LightingLayer } from './lightingOverlay'
 export interface HazardVisual {
   texture: THREE.Texture | null
   footprint: { point: SurfacePoint; radius: number } | null
-  layer: AnalysisLayer | LightingLayer
+  layer: AnalysisLayer | LightingLayer | 'science'
 }
 export default function HazardPanel({
   asset,
