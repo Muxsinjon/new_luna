@@ -10,7 +10,8 @@ Updated 2026-11-14. Reference directory: user-supplied `Lunar_Landing_Navigator_
 |---|---|---|
 | moon_color.jpg (2048 × 1024) | SVS 4720 `lroc_color_poles_2k.tif` | NASA SVS CGI Moon Kit (LRO LROC WAC) |
 | moon_height.jpg (1024 × 512) | SVS 4720 `ldem_3_8bit.jpg` | NASA SVS CGI Moon Kit (LRO LOLA) |
-| earth.jpg (2048 × 1024) | SVS 2915 `bluemarble-2048.png` | NASA Blue Marble |
+| earth.jpg (4096 × 2048) | SVS 3615 `flat_earth_Largest_still.0330.jpg` (Earth with clouds) | NASA GSFC Scientific Visualization Studio (Greg Shirah) |
+| stars_bsc5.json (8,404 stars, V ≤ 6.5) | NASA HEASARC `heasarc_bsc5p.tdat.gz` (Yale Bright Star Catalogue, 5th ed.), via `pipeline/make_stars.py` | NASA HEASARC; J2000 RA/Dec, V mag, B−V |
 | stars.jpg (2048 × 1024) | SVS 4851 `hiptyc_2020_4k_print.jpg` | NASA SVS Deep Star Maps (Hipparcos-2, Tycho-2) |
 | earth_night.jpg (2048 × 1024) | SVS 30028 `earthatnight2012_print.jpg` | NASA Black Marble 2012 (Suomi NPP VIIRS) |
 | sun.jpg (1024 × 1024) | SDO `latest_1024_0304.jpg` (2026-11-15) | NASA/SDO and the AIA science team |

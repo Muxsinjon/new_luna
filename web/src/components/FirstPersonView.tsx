@@ -6,10 +6,11 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import type { Vec3 } from '../lib/geometry'
 import { lookVector, type CameraFrame } from '../lib/firstPerson'
-import { meshArrays, type TerrainAsset } from '../lib/terrainMesh'
+import { bodyDirectionToLocal, meshArrays, type TerrainAsset } from '../lib/terrainMesh'
 import type { FarField } from '../lib/terrainShadow'
 import { cssVar } from '../lib/theme'
-import { makeEarth, makeSun, texture } from './story/bodies'
+import { makeEarth, makeSun, makeStarPoints } from './story/bodies'
+import { starsMoonME } from '../lib/stars'
 
 export interface Bodies {
   /** mesh-frame unit directions from the camera */
@@ -40,6 +41,8 @@ export default function FirstPersonView({
   onView,
   onFov,
   onWalk,
+  sunMoonME,
+  timeMs,
 }: {
   asset: TerrainAsset
   frame: CameraFrame
@@ -55,7 +58,14 @@ export default function FirstPersonView({
   onView: (v: { az: number; el: number }) => void
   onFov: (f: number) => void
   onWalk: (azDeg: number, metres: number) => void
+  /** MOON_ME unit vector to the Sun and the time, used to place the real star field */
+  sunMoonME: Vec3
+  timeMs: number
 }) {
+  const starInput = useRef({ sun: sunMoonME, t: timeMs })
+  useEffect(() => {
+    starInput.current = { sun: sunMoonME, t: timeMs }
+  })
   const host = useRef<HTMLDivElement>(null)
   const api = useRef<{
     setCamera: (f: CameraFrame, v: { az: number; el: number }, fov: number) => void
@@ -132,13 +142,26 @@ export default function FirstPersonView({
     const sun = sunBody.group,
       earth = earthBody.group
     scene.add(sun, earth)
-    const starTex = texture('stars.jpg')
-    const sky = new THREE.Mesh(
-      new THREE.SphereGeometry(250_000, 48, 24),
-      new THREE.MeshBasicMaterial({ map: starTex, side: THREE.BackSide, color: 0x555555, depthWrite: false }),
-    )
-    sky.rotation.x = (-23.44 * Math.PI) / 180
+    // real catalogue stars (NASA HEASARC BSC5) as crisp points, placed for the current date
+    const starPts = makeStarPoints(200_000)
+    const sky = starPts.points
     scene.add(sky)
+    let starKey = ''
+    const placeStars = () => {
+      const { sun, t } = starInput.current
+      const cat = starPts.catalogue()
+      const key = `${Math.floor(t / 3_600_000)}`
+      if (!cat.length || key === starKey) return
+      starKey = key
+      const m = starsMoonME(cat, sun, t)
+      const out = new Float32Array(m.length)
+      for (let i = 0; i < m.length; i += 3) out.set(bodyDirectionToLocal([m[i], m[i + 1], m[i + 2]], asset.meta.origin), i)
+      starPts.place(out)
+    }
+    void starPts.ready.then(() => {
+      placeStars()
+      render()
+    })
     const rig = new THREE.Group()
     const camera = new THREE.PerspectiveCamera(60, 1, 0.05, 300_000)
     rig.add(camera)
@@ -188,6 +211,7 @@ export default function FirstPersonView({
       sunLight.position.set(f.pos[0] + b.sun[0] * 1000, f.pos[1] + b.sun[1] * 1000, f.pos[2] + b.sun[2] * 1000)
       earthBody.setSun(new THREE.Vector3(...b.sun))
       sky.position.set(...f.pos)
+      placeStars()
       sunLight.target.position.set(...f.pos)
       render()
     }
@@ -288,8 +312,7 @@ export default function FirstPersonView({
       ringMat.dispose()
       sunBody.dispose()
       earthBody.dispose()
-      starTex.dispose()
-      sky.geometry.dispose()
+      starPts.dispose()
       renderer.dispose()
       canvas.remove()
     }

@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-15T03:00:29+00:00",
+ "generated": "2026-11-15T03:31:18+00:00",
  "files": {
   "moon_color.jpg": {
    "source": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_poles_2k.tif",
@@ -32,14 +32,14 @@
    "bytes": 408818
   },
   "earth.jpg": {
-   "source": "https://svs.gsfc.nasa.gov/vis/a000000/a002900/a002915/bluemarble-2048.png",
-   "sourceSha256": "ae6214b078ed0864c96f74bcb10ae3021f6eb116f8059797efe0fa9ea8b89d35",
+   "source": "https://svs.gsfc.nasa.gov/vis/a000000/a003600/a003615/flat_earth_Largest_still.0330.jpg",
+   "sourceSha256": "5ea6b68a4412421cae11711ae4fec1a7b1f2dbd7265c0c3004d487a03c43be9a",
    "size": [
-    2048,
-    1024
+    4096,
+    2048
    ],
-   "credit": "NASA SVS Blue Marble seamless mosaic of the Earth, svs.gsfc.nasa.gov/2915",
-   "bytes": 237359
+   "credit": "NASA SVS 3615 Earth with clouds (Greg Shirah, NASA GSFC Scientific Visualization Studio), svs.gsfc.nasa.gov/3615",
+   "bytes": 1472960
   },
   "earth_night.jpg": {
    "source": "https://svs.gsfc.nasa.gov/vis/a030000/a030000/a030028/earthatnight2012_print.jpg",

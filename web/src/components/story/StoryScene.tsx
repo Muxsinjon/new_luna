@@ -7,7 +7,8 @@ import { vectorsAt } from '../../lib/analysis'
 import type { Ephemeris } from '../../lib/data'
 import { unitVec, type Vec3 } from '../../lib/geometry'
 import { cssVar } from '../../lib/theme'
-import { makeEarth, makeSun } from './bodies'
+import { makeEarth, makeSun, makeStarPoints } from './bodies'
+import { starsMoonME } from '../../lib/stars'
 
 const BASE = import.meta.env.BASE_URL + 'textures/'
 /** MOON_ME (x lon 0, y lon 90° E, z north) -> three.js sphere frame (Y up, lon 0 at +X, lon 90° E at −Z) */
@@ -48,11 +49,11 @@ function keyframes(earthDir: V, sunDir: V): [number, V, V][] {
   const [ep, et] = poleView(earthDir)
   const hero = e
     .clone()
-    .add(earthDir.clone().multiplyScalar(9))
-    .add(side.clone().multiplyScalar(-5.5))
+    .add(earthDir.clone().multiplyScalar(17))
+    .add(side.clone().multiplyScalar(9.5))
     .add(new THREE.Vector3(0, 1.2, 0))
   return [
-    [0.0, hero, side.clone().multiplyScalar(-6)],
+    [0.0, hero, side.clone().multiplyScalar(4)],
     [
       0.2,
       earthDir
@@ -107,12 +108,16 @@ export default function StoryScene({
     // stars: ecliptic north roughly along the Moon's spin axis (within 1.5°); longitude aligned with the Sun each frame
     const stars = new THREE.Mesh(
       new THREE.SphereGeometry(1500, 48, 24),
-      new THREE.MeshBasicMaterial({ map: load('stars.jpg'), side: THREE.BackSide, color: 0x8a8a8a }),
+      new THREE.MeshBasicMaterial({ map: load('stars.jpg'), side: THREE.BackSide, color: 0x262626 }),
     )
     stars.rotation.x = (-23.44 * Math.PI) / 180
     const starRig = new THREE.Group()
     starRig.add(stars)
     scene.add(starRig)
+    // crisp catalogue stars (the photo above is kept only as a faint Milky Way glow)
+    const starPts = makeStarPoints(1400)
+    scene.add(starPts.points)
+    let starHour = -1
     const moon = new THREE.Mesh(
       new THREE.SphereGeometry(1, 192, 96),
       new THREE.MeshStandardMaterial({
@@ -172,7 +177,15 @@ export default function StoryScene({
       earthBody.setSun(sd)
       earth.position.copy(ed).multiplyScalar(EARTH_DIST)
       earth.rotation.y = (t / 86_164_100) * 2 * Math.PI // sidereal spin (illustrative)
-      starRig.rotation.y = Math.atan2(-sd.z, sd.x) // keeps the star field consistent with the Sun direction
+      starRig.rotation.y = Math.atan2(-sd.z, sd.x) // keeps the faint Milky Way glow roughly consistent with the Sun
+      const hourNow = Math.floor(t / 3_600_000)
+      if (hourNow !== starHour && starPts.catalogue().length) {
+        starHour = hourNow
+        const m = starsMoonME(starPts.catalogue(), sv, t)
+        const d = new Float32Array(m.length)
+        for (let i = 0; i < m.length; i += 3) d.set([m[i], m[i + 2], -m[i + 1]], i) // MOON_ME -> three
+        starPts.place(d)
+      }
       // camera along the keyframes, eased and damped for smoothness
       const keys = keyframes(ed, sd)
       let i = 0
@@ -209,6 +222,7 @@ export default function StoryScene({
         mat?.dispose?.()
       })
       earthBody.dispose()
+      starPts.dispose()
       sunBody.dispose()
       renderer.dispose()
       renderer.domElement.remove()

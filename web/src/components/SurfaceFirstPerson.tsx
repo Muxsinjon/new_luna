@@ -168,6 +168,8 @@ export default function SurfaceFirstPerson({ site, slot, info }: { site: Site; s
           onView={setView}
           onFov={setFov}
           onWalk={doWalk}
+          sunMoonME={moon.sun}
+          timeMs={s.selectedTime}
         />
       </Suspense>
       <div className="fp-compass num" aria-live="polite" data-testid="fp-heading" data-az={view.az} data-el={view.el}>
