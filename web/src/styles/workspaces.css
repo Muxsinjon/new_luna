@@ -1156,3 +1156,12 @@ dialog.summary::backdrop {
   font-family: var(--font-hero);
   font-size: var(--fs-0);
 }
+
+/* Redesign: Simple view (default for new visitors). Expert sections stay in the DOM and in the URL state;
+   "Show all controls" in the header reveals them. */
+.ui-simple .adv {
+  display: none !important;
+}
+.adv-inline {
+  display: contents;
+}

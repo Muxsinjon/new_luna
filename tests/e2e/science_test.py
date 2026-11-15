@@ -37,7 +37,7 @@ with sync_playwright() as p:
     console = []
     page.on('console', lambda m: console.append((m.type, m.text)) if m.type in ('error', 'warning') else None)
     page.on('pageerror', lambda e: console.append(('pageerror', str(e))))
-    page.goto(BASE + '#ws=terrain&a=shackleton-rim-site04&b=connecting-ridge&sv=A')
+    page.goto(BASE + '#ui=full&ws=terrain&a=shackleton-rim-site04&b=connecting-ridge&sv=A')
     canvas = page.locator('.terrain-canvas canvas')
     expect(canvas).to_be_visible(timeout=30000)
     sel = page.get_by_role('combobox', name='Science layer', exact=True)

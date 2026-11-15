@@ -15,6 +15,8 @@ export interface MissionState {
   surfaceSite: 'A' | 'B'
   /** Surface View in 3D first-person mode on 5 m terrain (Milestone 7) */
   surface3d: boolean
+  /** show every expert control (false = simple view for first-time users) */
+  full: boolean
   missionStart: number
   durationDays: number
   selectedTime: number
@@ -39,6 +41,7 @@ export const DEFAULT_STATE: MissionState = {
   siteB: 'connecting-ridge',
   surfaceSite: 'A',
   surface3d: false,
+  full: false,
   missionStart: Date.parse('2026-11-14T00:00:00Z'),
   durationDays: 14,
   selectedTime: Date.parse('2026-11-22T01:00:00Z'),
@@ -71,6 +74,7 @@ export function toHash(s: MissionState): string {
     b: s.siteB,
     sv: s.surfaceSite,
     fp: s.surface3d ? '1' : '',
+    ui: s.full ? 'full' : 'simple',
     t: iso(s.missionStart),
     d: String(s.durationDays),
     at: iso(s.selectedTime),
@@ -130,6 +134,7 @@ export function fromHash(hash: string, base: MissionState = DEFAULT_STATE): Miss
     siteB: p.get('b') || base.siteB,
     surfaceSite: p.get('sv') === 'B' ? 'B' : p.get('sv') === 'A' ? 'A' : base.surfaceSite,
     surface3d: p.get('fp') === '1' ? true : p.get('fp') === '' ? false : base.surface3d,
+    full: p.get('ui') === 'full' ? true : p.get('ui') === 'simple' ? false : base.full,
     missionStart: time(p.get('t')) ?? base.missionStart,
     durationDays: d ?? base.durationDays,
     selectedTime: time(p.get('at')) ?? base.selectedTime,

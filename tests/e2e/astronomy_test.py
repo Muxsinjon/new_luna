@@ -21,7 +21,7 @@ with sync_playwright() as p:
     console = []
     page.on('console', lambda m: console.append((m.type, m.text)) if m.type in ('error', 'warning') else None)
     page.on('pageerror', lambda e: console.append(('pageerror', str(e))))
-    page.goto(BASE + f'#ws=terrain&a=connecting-ridge&sv=A&t={T}&d=14&at={T}')
+    page.goto(BASE + f'#ui=full&ws=terrain&a=connecting-ridge&sv=A&t={T}&d=14&at={T}')
     sky = page.get_by_test_id('sky-readout')
     expect(sky).to_be_visible(timeout=30000)
     got = {k: float(sky.get_attribute(f'data-{k}')) for k in ('sun-az', 'sun-el', 'earth-az', 'earth-el')}
@@ -38,13 +38,13 @@ with sync_playwright() as p:
     page.get_by_role('button', name='Next hour').click()
     expect(sky).not_to_have_attribute('data-sun-az', str(got['sun-az']))
     # Surface View shows the Earth phase from the same instant
-    page.goto(BASE + f'#ws=surface&a=connecting-ridge&sv=A&t={T}&d=14&at={T}')
+    page.goto(BASE + f'#ui=full&ws=surface&a=connecting-ridge&sv=A&t={T}&d=14&at={T}')
     txt = page.get_by_text(re.compile(r'of Earth.s disc sunlit')).inner_text()
     lit = float(re.search(r'(\d+)\s*%\s*of Earth', txt).group(1))
     assert abs(lit - cr['earth']['illuPct'][i]) <= 0.6, (lit, cr['earth']['illuPct'][i])
     assert re.search(r'apparent diameter [12]\.\d\d°', txt), txt
     # out-of-range request is clamped with an explanation, never extrapolated
-    page.goto(BASE + '#ws=compare&a=connecting-ridge&t=2035-01-01T00:00:00Z&d=14')
+    page.goto(BASE + '#ui=full&ws=compare&a=connecting-ridge&t=2035-01-01T00:00:00Z&d=14')
     page.wait_for_timeout(500)
     assert '2035' not in page.url, page.url
     bad = [m for m in console if not (m[0] == 'warning' and 'GPU stall due to ReadPixels' in m[1])]

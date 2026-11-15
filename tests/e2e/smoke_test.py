@@ -32,8 +32,19 @@ with sync_playwright() as p:
     page.on("console", lambda m: console.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") and "GPU stall due to ReadPixels" not in m.text else None)
     page.on("pageerror", lambda e: console.append(f"pageerror: {e}"))
 
+    def simple_view():
+        """Simple view (default for new visitors) hides expert settings; the header switch reveals them."""
+        page.goto(BASE + "#ui=simple&ws=finder")
+        page.reload()
+        expect(page.get_by_text("Minimum sunlight")).to_be_visible()
+        expect(page.get_by_text("Maximum communication blackout")).to_be_hidden()
+        expect(page.get_by_role("radiogroup", name="Visibility model")).to_be_hidden()
+        page.get_by_role("button", name="Show all controls").click()
+        expect(page.get_by_text("Maximum communication blackout")).to_be_visible()
+        expect(page).to_have_url(re.compile(r"ui=full"))
+
     def welcome():
-        page.goto(BASE)
+        page.goto(BASE + "#ui=full&ws=home")
         page.wait_for_load_state("networkidle")
         expect(page.get_by_role("heading", name=re.compile("Launching to the Moon"))).to_be_visible()
         page.get_by_role("button", name=re.compile("^Explore landing sites")).click()
@@ -91,7 +102,7 @@ with sync_playwright() as p:
         dlg.get_by_role("button", name="Close summary").click()
 
     def share_link():
-        url = BASE + "#ws=surface&a=im-1&b=im-2&sv=A&t=2026-12-01T00%3A00Z&d=3&at=2026-12-01T06%3A00Z&vis=geometric&mode=explore&tz=utc"
+        url = BASE + "#ui=full&ws=surface&a=im-1&b=im-2&sv=A&t=2026-12-01T00%3A00Z&d=3&at=2026-12-01T06%3A00Z&vis=geometric&mode=explore&tz=utc"
         p2 = ctx.new_page()
         p2.goto(url)
         p2.wait_for_load_state("networkidle")
@@ -103,7 +114,7 @@ with sync_playwright() as p:
 
     def unsupported_date():
         p3 = ctx.new_page()
-        p3.goto(BASE + "#ws=compare&t=2040-01-01T00%3A00Z&d=14")
+        p3.goto(BASE + "#ui=full&ws=compare&t=2040-01-01T00%3A00Z&d=14")
         p3.wait_for_load_state("networkidle")
         expect(p3.get_by_text(re.compile("past the supported data"))).to_be_visible()
         p3.close()
@@ -123,6 +134,7 @@ with sync_playwright() as p:
         expect(page.get_by_role("heading", name="Supported sites and dates")).to_be_visible()
 
     for name, fn in [
+        ("simple view hides expert settings", simple_view),
         ("welcome screen and entry", welcome),
         ("pick two sites, elevation charts", pick_sites),
         ("scrub time (buttons and keyboard)", scrub_time),

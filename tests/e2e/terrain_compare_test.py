@@ -50,7 +50,7 @@ with sync_playwright() as pw:
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.on('requestfailed', lambda r: failures.append((r.url, r.failure)))
     page.on('console', lambda m: console.append((m.type, m.text)) if m.type in ('error', 'warning') else None)
-    page.goto(a.base + '#ws=terrain&a=shackleton-rim-site04&b=nobile-rim-1-site06&sv=A')
+    page.goto(a.base + '#ui=full&ws=terrain&a=shackleton-rim-site04&b=nobile-rim-1-site06&sv=A')
     expect(page.get_by_test_id('slope-method-warning')).to_be_visible(timeout=30000)  # single view fully loaded first
     t0 = time.time()
     page.get_by_role('radio', name='Compare A and B').click()

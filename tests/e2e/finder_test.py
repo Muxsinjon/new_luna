@@ -52,7 +52,7 @@ with sync_playwright() as p:
     console = []
     page.on('console', lambda m: console.append((m.type, m.text)) if m.type in ('error', 'warning') else None)
     page.on('pageerror', lambda e: console.append(('pageerror', str(e))))
-    page.goto(BASE + '#ws=finder&a=shackleton-rim-site04&b=nobile-rim-1-site06&d=14&ss=2027-01-01T00:00Z&se=2027-01-15T00:00Z'
+    page.goto(BASE + '#ui=full&ws=finder&a=shackleton-rim-site04&b=nobile-rim-1-site06&d=14&ss=2027-01-01T00:00Z&se=2027-01-15T00:00Z'
               f'&rs=0&re=0&rd=2000&rb=2000&rj=&tr={SLOPE},{ROUGH},{RADIUS},{MINPCT}&w=0,0,1,0,0,1')
     expect(page.get_by_label('Require a suitable terrain footprint')).to_be_checked()
     page.get_by_role('radio', name='Site A and B').click()

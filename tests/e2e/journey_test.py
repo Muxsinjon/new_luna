@@ -52,7 +52,7 @@ with sync_playwright() as p:
             problems.append((where, bad[:5]))
 
     # 1. landing page: discover real sites
-    page.goto(a.base)
+    page.goto(a.base + "#ui=full")
     expect(page.get_by_role('heading', name=re.compile('Launching to the Moon'))).to_be_visible(timeout=30000)
     audit('welcome'); shot('01-welcome')
     page.get_by_role('button', name=re.compile('^Explore landing sites')).click()
@@ -60,7 +60,7 @@ with sync_playwright() as p:
     page.get_by_label('Site B', exact=True).select_option('nobile-rim-1-site06')
     expect(page).to_have_url(re.compile(r'a=shackleton-rim-site04.*b=nobile-rim-1-site06'))
     # 4. mission period: terrain-aware sunlight and Earth visibility over time (2027-01-01, 14 days)
-    page.goto(a.base + '#ws=compare&a=shackleton-rim-site04&b=nobile-rim-1-site06&t=2027-01-01T00:00Z&d=14&at=2027-01-05T12:00Z')
+    page.goto(a.base + '#ui=full&ws=compare&a=shackleton-rim-site04&b=nobile-rim-1-site06&t=2027-01-01T00:00Z&d=14&at=2027-01-05T12:00Z')
     page.reload()
     expect(page.get_by_role('img', name=re.compile(r'^Sun elevation for both sites'))).to_be_visible(timeout=30000)
     expect(page.get_by_role('row', name=re.compile('Full Sun disc visible'))).to_be_visible()
@@ -84,7 +84,7 @@ with sync_playwright() as p:
     expect(page.get_by_test_id('lighting-stats-A')).to_be_visible(timeout=40000)
     shot('03-terrain-sunlight')
     # 5. explainable rankings with the same terrain limits
-    page.goto(a.base + '#ws=finder&a=shackleton-rim-site04&b=nobile-rim-1-site06&d=14&ss=2027-01-01T00:00Z&se=2027-01-31T00:00Z'
+    page.goto(a.base + '#ui=full&ws=finder&a=shackleton-rim-site04&b=nobile-rim-1-site06&d=14&ss=2027-01-01T00:00Z&se=2027-01-31T00:00Z'
               '&rs=30&re=30&rd=200&rb=200&rj=&tr=20,1,100,90&w=0,0,1,0,0,1')
     page.reload()
     page.get_by_role('radio', name='Site A and B').click()
@@ -137,7 +137,7 @@ with sync_playwright() as p:
     # mobile layout of every workspace
     page.set_viewport_size({'width': 390, 'height': 844})
     for ws in ('home', 'compare', 'finder', 'surface', 'terrain', 'about'):
-        page.goto(a.base + f'#ws={ws}&a=shackleton-rim-site04&b=nobile-rim-1-site06')
+        page.goto(a.base + f'#ui=full&ws={ws}&a=shackleton-rim-site04&b=nobile-rim-1-site06')
         page.reload()
         page.wait_for_timeout(2500)
         if not page.evaluate('document.documentElement.scrollWidth<=window.innerWidth'):

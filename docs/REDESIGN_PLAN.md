@@ -84,3 +84,12 @@ A sticky full-screen 3D scene; scrolling drives the camera and time.
   - Real stars in Surface View.
   - Palette: moonlight accent `#e9e2d0` (Sun gold and Earth blue keep their meanings), warm text, and the Unbounded display face (self-hosted, OFL) for titles.
   - A 3-step plain-language guide (`GuideStrip.tsx`) on Compare, Finder, Surface and Terrain, which users can hide.
+- **Simple view (2026-11-15):**
+  - New visitors get a simple view by default: state `full` = false, URL `ui=simple`.
+  - Expert sections carry the class `adv` and are hidden by `.ui-simple .adv`. The header's "Show all controls" button reveals them, and the choice is kept in the URL.
+  - Hidden in Simple view:
+    - header toggles (visibility model, audience, time zone);
+    - finder limits (joint, darkness, blackout, terrain requirement, weights, start spacing, filters);
+    - compare: the mission validation card, the model label and the "more" details;
+    - terrain: the shared threshold form, quality notes, coordinate inspector, hazard and science panels, and sources.
+  - The e2e suites use `ui=full`, and smoke checks Simple view.

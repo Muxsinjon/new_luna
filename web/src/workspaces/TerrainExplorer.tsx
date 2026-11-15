@@ -260,7 +260,9 @@ export default function TerrainExplorer() {
               Linked views share the camera offset in metres around each site, so both terrains appear at the same physical scale and
               orientation (X east, Y up, Z south). The two crops are separate places; side by side does not mean adjacent.
             </p>
-            <SharedCriteria settings={settings} onSettings={patch} />
+            <div className="adv">
+              <SharedCriteria settings={settings} onSettings={patch} />
+            </div>
             <div className="terrain-compare">
               {(['A', 'B'] as const).map((slot) => {
                 const t = slot === 'A' ? terrainA : terrainB,
@@ -298,11 +300,11 @@ export default function TerrainExplorer() {
           <p role="status">Loading verified NASA terrain…</p>
         ) : (
           <>
-            <p className="terrain-quality">
+            <p className="terrain-quality adv">
               Real NASA PGDA {shown.meta.product ?? 'Site01'} elevation: 5 m source pixels, 20 m mesh spacing, 8 × 8 km coverage. True
               horizontal and vertical scale (1×), including lunar curvature.
             </p>
-            <p className="muted">
+            <p className="muted adv">
               {st.name}. About 90% of native pixels are interpolated between laser returns. Pixel spacing is not measurement accuracy.
             </p>
             {shown.meta.imagery && (
@@ -360,14 +362,18 @@ export default function TerrainExplorer() {
                 site={st}
               />
             )}
-            {current && <SciencePanel science={science} asset={shown} point={picked ?? current} />}
+            {current && (
+              <div className="adv">
+                <SciencePanel science={science} asset={shown} point={picked ?? current} />
+              </div>
+            )}
             <p className="hint">
               Drag to rotate, scroll or pinch to zoom, right drag or two fingers to pan. Focus the canvas and use arrow keys to pan, or use
               the camera buttons. Click terrain to select a point. Magenta marks the mission site; cyan marks your picked point. Local axes:
               X east, Y up, Z south. Inspection lighting does not model mission sunlight.
             </p>
             {imagery && <p className="hint">{shown.meta.imagery?.note}</p>}
-            <section className="panel">
+            <section className="panel adv">
               <h3>Selected surface point</h3>
               <p
                 className="num"
@@ -427,18 +433,20 @@ export default function TerrainExplorer() {
                 regional DEM over 250 km, not this local mesh.
               </p>
             </section>
-            <HazardPanel
-              key={terrainId}
-              asset={shown}
-              point={picked}
-              theme={theme}
-              onVisual={setVisual}
-              siteId={terrainId}
-              siteName={shown.meta.product ?? 'Site01'}
-              settings={settings}
-              onSettings={patch}
-            />
-            <details className="panel">
+            <div className="adv">
+              <HazardPanel
+                key={terrainId}
+                asset={shown}
+                point={picked}
+                theme={theme}
+                onVisual={setVisual}
+                siteId={terrainId}
+                siteName={shown.meta.product ?? 'Site01'}
+                settings={settings}
+                onSettings={patch}
+              />
+            </div>
+            <details className="panel adv">
               <summary>Sources, uncertainty and image alignment</summary>
               <p>
                 <a href="https://pgda.gsfc.nasa.gov/products/78" target="_blank" rel="noreferrer">

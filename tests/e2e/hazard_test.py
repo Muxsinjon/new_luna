@@ -11,7 +11,7 @@ with sync_playwright() as p:
  b=p.chromium.launch(executable_path=os.environ.get('CHROMIUM') or ('/usr/bin/chromium' if os.path.exists('/usr/bin/chromium') else None),headless=True,args=['--enable-unsafe-swiftshader'])
  page=b.new_page(viewport={'width':1440,'height':1000});errors=[];failed=[]
  page.on('pageerror',lambda e:errors.append(str(e)));page.on('requestfailed',lambda r:failed.append(r.url))
- page.goto(base+'#ws=terrain&a=connecting-ridge&sv=A')
+ page.goto(base+'#ui=full&ws=terrain&a=connecting-ridge&sv=A')
  canvas=page.locator('.terrain-canvas canvas');expect(canvas).to_be_visible(timeout=30000)
  expect(page.get_by_label('Analysis layer')).to_be_visible(timeout=30000)
  expect(page.get_by_test_id('slope-method-warning')).to_contain_text('not NASA')

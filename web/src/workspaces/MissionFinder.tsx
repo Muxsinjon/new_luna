@@ -362,113 +362,115 @@ export default function MissionFinder() {
             max={100}
             onChange={(v) => setReq({ minEarthPct: v })}
           />
-          <div className="field">
-            <label className="toggle">
-              <input
-                type="checkbox"
-                checked={s.req.minJointPct !== null}
-                onChange={(e) => setReq({ minJointPct: e.target.checked ? 30 : null })}
-              />{' '}
-              Require Sun and Earth together
-            </label>
-            {s.req.minJointPct !== null && (
-              <NumberField
-                label="Minimum Sun and Earth together"
-                value={s.req.minJointPct}
-                unit="%"
-                min={0}
-                max={100}
-                onChange={(v) => setReq({ minJointPct: v })}
-              />
-            )}
-          </div>
-          <NumberField
-            label="Maximum uninterrupted darkness"
-            value={s.req.maxDarkH}
-            unit="h"
-            min={0}
-            max={2000}
-            onChange={(v) => setReq({ maxDarkH: v })}
-          />
-          <NumberField
-            label="Maximum communication blackout"
-            value={s.req.maxBlackoutH}
-            unit="h"
-            min={0}
-            max={2000}
-            onChange={(v) => setReq({ maxBlackoutH: v })}
-          />
-          <fieldset className="field">
-            <legend className="field-label">Terrain requirement (hard)</legend>
-            <label className="toggle">
-              <input
-                type="checkbox"
-                checked={!!s.req.terrain}
-                onChange={(e) => setReq({ terrain: e.target.checked ? DEFAULT_TERRAIN_REQ : null })}
-              />{' '}
-              Require a suitable terrain footprint
-            </label>
-            {s.req.terrain && (
-              <>
+          <div className="adv">
+            <div className="field">
+              <label className="toggle">
+                <input
+                  type="checkbox"
+                  checked={s.req.minJointPct !== null}
+                  onChange={(e) => setReq({ minJointPct: e.target.checked ? 30 : null })}
+                />{' '}
+                Require Sun and Earth together
+              </label>
+              {s.req.minJointPct !== null && (
                 <NumberField
-                  label="Maximum slope"
-                  hint="3 × 3 OLS, 15 m"
-                  value={s.req.terrain.maxSlopeDeg}
-                  unit="°"
-                  min={0}
-                  max={90}
-                  onChange={(v) => setTerrain({ maxSlopeDeg: v })}
-                />
-                <NumberField
-                  label="Maximum roughness"
-                  hint="RMS, 25 m"
-                  value={s.req.terrain.maxRoughM}
-                  unit="m"
-                  min={0}
-                  max={100}
-                  onChange={(v) => setTerrain({ maxRoughM: v })}
-                />
-                <NumberField
-                  label="Footprint radius"
-                  value={s.req.terrain.radiusM}
-                  unit="m"
-                  min={5}
-                  max={2000}
-                  onChange={(v) => setTerrain({ radiusM: v })}
-                />
-                <NumberField
-                  label="Footprint share meeting both"
-                  value={s.req.terrain.minMeetsPct}
+                  label="Minimum Sun and Earth together"
+                  value={s.req.minJointPct}
                   unit="%"
                   min={0}
                   max={100}
-                  onChange={(v) => setTerrain({ minMeetsPct: v })}
+                  onChange={(v) => setReq({ minJointPct: v })}
                 />
-                <p className="hint">
-                  Only sites inside processed NASA 5 m terrain (Connecting Ridge, Shackleton Rim, Nobile Rim 1) can be screened. Every other
-                  site is shown as insufficient data, never as passing. Limits are illustrative, not NASA landing standards.
-                </p>
-              </>
-            )}
-          </fieldset>
-          <fieldset className="field">
-            <legend className="field-label">Preferences (soft, order windows within the same status)</legend>
-            {(Object.keys(WEIGHT_LABEL) as (keyof Weights)[]).map((k) => (
-              <NumberField
-                key={k}
-                label={`Weight: ${WEIGHT_LABEL[k]}`}
-                value={s.weights[k]}
-                unit="×"
-                min={0}
-                max={10}
-                onChange={(v) => setWeight(k, v)}
-                hint={k === 'terrain' && !s.req.terrain ? 'needs the terrain requirement' : undefined}
-              />
-            ))}
-            <p className="hint">
-              Score = Σ weight × normalized value ÷ Σ weights. Preferences never turn a failing window into a passing one.
-            </p>
-          </fieldset>
+              )}
+            </div>
+            <NumberField
+              label="Maximum uninterrupted darkness"
+              value={s.req.maxDarkH}
+              unit="h"
+              min={0}
+              max={2000}
+              onChange={(v) => setReq({ maxDarkH: v })}
+            />
+            <NumberField
+              label="Maximum communication blackout"
+              value={s.req.maxBlackoutH}
+              unit="h"
+              min={0}
+              max={2000}
+              onChange={(v) => setReq({ maxBlackoutH: v })}
+            />
+            <fieldset className="field">
+              <legend className="field-label">Terrain requirement (hard)</legend>
+              <label className="toggle">
+                <input
+                  type="checkbox"
+                  checked={!!s.req.terrain}
+                  onChange={(e) => setReq({ terrain: e.target.checked ? DEFAULT_TERRAIN_REQ : null })}
+                />{' '}
+                Require a suitable terrain footprint
+              </label>
+              {s.req.terrain && (
+                <>
+                  <NumberField
+                    label="Maximum slope"
+                    hint="3 × 3 OLS, 15 m"
+                    value={s.req.terrain.maxSlopeDeg}
+                    unit="°"
+                    min={0}
+                    max={90}
+                    onChange={(v) => setTerrain({ maxSlopeDeg: v })}
+                  />
+                  <NumberField
+                    label="Maximum roughness"
+                    hint="RMS, 25 m"
+                    value={s.req.terrain.maxRoughM}
+                    unit="m"
+                    min={0}
+                    max={100}
+                    onChange={(v) => setTerrain({ maxRoughM: v })}
+                  />
+                  <NumberField
+                    label="Footprint radius"
+                    value={s.req.terrain.radiusM}
+                    unit="m"
+                    min={5}
+                    max={2000}
+                    onChange={(v) => setTerrain({ radiusM: v })}
+                  />
+                  <NumberField
+                    label="Footprint share meeting both"
+                    value={s.req.terrain.minMeetsPct}
+                    unit="%"
+                    min={0}
+                    max={100}
+                    onChange={(v) => setTerrain({ minMeetsPct: v })}
+                  />
+                  <p className="hint">
+                    Only sites inside processed NASA 5 m terrain (Connecting Ridge, Shackleton Rim, Nobile Rim 1) can be screened. Every
+                    other site is shown as insufficient data, never as passing. Limits are illustrative, not NASA landing standards.
+                  </p>
+                </>
+              )}
+            </fieldset>
+            <fieldset className="field">
+              <legend className="field-label">Preferences (soft, order windows within the same status)</legend>
+              {(Object.keys(WEIGHT_LABEL) as (keyof Weights)[]).map((k) => (
+                <NumberField
+                  key={k}
+                  label={`Weight: ${WEIGHT_LABEL[k]}`}
+                  value={s.weights[k]}
+                  unit="×"
+                  min={0}
+                  max={10}
+                  onChange={(v) => setWeight(k, v)}
+                  hint={k === 'terrain' && !s.req.terrain ? 'needs the terrain requirement' : undefined}
+                />
+              ))}
+              <p className="hint">
+                Score = Σ weight × normalized value ÷ Σ weights. Preferences never turn a failing window into a passing one.
+              </p>
+            </fieldset>
+          </div>
           <div className="field">
             <span className="field-label">Sites to search</span>
             <div className="seg full" role="radiogroup" aria-label="Sites to search">
@@ -492,7 +494,7 @@ export default function MissionFinder() {
               </button>
             </div>
           </div>
-          <label className="field">
+          <label className="field adv">
             <span className="field-label">Candidate start times</span>
             <select value={everyH} onChange={(e) => setEveryH(+e.target.value)}>
               <option value={6}>Every 6 h (00, 06, 12, 18 UTC)</option>
@@ -605,7 +607,7 @@ export default function MissionFinder() {
               </figure>
             )}
 
-            <div className="list-tools">
+            <div className="list-tools adv">
               <label className="field inline">
                 <span className="field-label">Show</span>
                 <select value={filter} onChange={(e) => setFilter(e.target.value as Status | 'all')}>

@@ -29,7 +29,7 @@ with sync_playwright() as pw:
     console = []
     page.on('console', lambda m: console.append((m.type, m.text)) if m.type in ('error', 'warning') else None)
     page.on('pageerror', lambda e: console.append(('pageerror', str(e))))
-    page.goto(a.base + f'#ws=surface&a=connecting-ridge&sv=A&fp=1&t={T}&d=14&at={T}')
+    page.goto(a.base + f'#ui=full&ws=surface&a=connecting-ridge&sv=A&fp=1&t={T}&d=14&at={T}')
     sky = page.get_by_test_id('fp-sky')
     expect(sky).to_have_attribute('data-sun-frac', re.compile(r'.'), timeout=60000)
     canvas = page.locator('[data-testid=first-person] canvas')
@@ -50,7 +50,7 @@ with sync_playwright() as pw:
 
     # Shackleton Rim crater wall, 2027-01-05 12:00 UTC: Sun above 0° but hidden by the 5 m terrain (computed 0 %)
     def sun_pixel(site, at):
-        page.goto(a.base + f'#ws=surface&a={site}&sv=A&fp=1&t={at[:10]}T00:00Z&d=14&at={at}')
+        page.goto(a.base + f'#ui=full&ws=surface&a={site}&sv=A&fp=1&t={at[:10]}T00:00Z&d=14&at={at}')
         page.reload()
         expect(sky).to_have_attribute('data-sun-frac', re.compile(r'.'), timeout=60000)
         page.get_by_label('Surface overlay').select_option('none')
@@ -85,14 +85,14 @@ with sync_playwright() as pw:
     expect(page.get_by_test_id('horizon-profile')).to_be_visible()
     expect(page.get_by_text('Realism limits of this view')).to_be_visible()
     # coverage fallback: no 5 m terrain at Apollo 11
-    page.goto(a.base + '#ws=surface&a=apollo-11&sv=A&fp=1')
+    page.goto(a.base + '#ui=full&ws=surface&a=apollo-11&sv=A&fp=1')
     page.reload()
     expect(page.get_by_test_id('fp-unavailable')).to_be_visible(timeout=20000)
     expect(page.get_by_role('radio', name='3D first person (5 m terrain)')).to_be_disabled()
     expect(page.get_by_role('radio', name='360° horizon panorama')).to_be_checked()
     # load-error path: missing horizon inputs are reported, not hidden
     page.route('**/site01/illumination/illumination.json', lambda r: r.fulfill(status=404, body='missing'))
-    page.goto(a.base + f'#ws=surface&a=connecting-ridge&sv=A&fp=1&t={T}&d=14&at={T}')
+    page.goto(a.base + f'#ui=full&ws=surface&a=connecting-ridge&sv=A&fp=1&t={T}&d=14&at={T}')
     page.reload()
     expect(page.get_by_role('alert').filter(has_text='Horizon inputs could not be loaded')).to_be_visible(timeout=40000)
     page.unroute('**/site01/illumination/illumination.json')

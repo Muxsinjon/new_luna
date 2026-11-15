@@ -90,33 +90,44 @@ export default function Header() {
         ))}
       </nav>
       <div className="top-controls">
-        <Seg<VisModel>
-          label="Visibility model"
-          value={s.vis}
-          onChange={(v) => set({ vis: v })}
-          options={[
-            ['terrain', 'Terrain-aware'],
-            ['geometric', 'Geometric 0°'],
-          ]}
-        />
-        <Seg<Mode>
-          label="Audience"
-          value={s.mode}
-          onChange={(v) => set({ mode: v })}
-          options={[
-            ['planner', 'Planner'],
-            ['explore', 'Explain'],
-          ]}
-        />
-        <Seg<TimeZoneMode>
-          label="Time zone"
-          value={s.tz}
-          onChange={(v) => set({ tz: v })}
-          options={[
-            ['utc', 'UTC'],
-            ['local', 'Local'],
-          ]}
-        />
+        <button
+          type="button"
+          className="btn quiet"
+          aria-pressed={s.full}
+          onClick={() => set({ full: !s.full })}
+          title="Simple view hides expert settings; nothing is removed"
+        >
+          {s.full ? 'Simple view' : 'Show all controls'}
+        </button>
+        <div className="adv adv-inline">
+          <Seg<VisModel>
+            label="Visibility model"
+            value={s.vis}
+            onChange={(v) => set({ vis: v })}
+            options={[
+              ['terrain', 'Terrain-aware'],
+              ['geometric', 'Geometric 0°'],
+            ]}
+          />
+          <Seg<Mode>
+            label="Audience"
+            value={s.mode}
+            onChange={(v) => set({ mode: v })}
+            options={[
+              ['planner', 'Planner'],
+              ['explore', 'Explain'],
+            ]}
+          />
+          <Seg<TimeZoneMode>
+            label="Time zone"
+            value={s.tz}
+            onChange={(v) => set({ tz: v })}
+            options={[
+              ['utc', 'UTC'],
+              ['local', 'Local'],
+            ]}
+          />
+        </div>
         <button
           type="button"
           className="btn quiet icon-only"

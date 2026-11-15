@@ -27,10 +27,10 @@ def surface(page):
 
 SCREENS = {
     "welcome": ("", None),
-    "compare": ("#ws=compare", None),
-    "finder": ("#ws=finder", finder),
-    "surface": ("#ws=surface", surface),
-    "about": ("#ws=about", None),
+    "compare": ("#ui=full&ws=compare", None),
+    "finder": ("#ui=full&ws=finder", finder),
+    "surface": ("#ui=full&ws=surface", surface),
+    "about": ("#ui=full&ws=about", None),
 }
 SIZES = {"1440": (1440, 900), "390": (390, 844)}
 

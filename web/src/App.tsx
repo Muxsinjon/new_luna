@@ -263,7 +263,7 @@ function Shell({ data, theme, setTheme }: { data: AppData; theme: Theme; setThem
   return (
     <StoreContext.Provider value={store}>
       <PrefsContext.Provider value={prefs}>
-        <div className={`app mode-${s.mode}`}>
+        <div className={`app mode-${s.mode} ${s.full ? 'ui-full' : 'ui-simple'}`}>
           <a href="#view" className="skip">
             Skip to content
           </a>

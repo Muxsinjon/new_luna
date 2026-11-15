@@ -17,7 +17,7 @@ with sync_playwright() as pw:
  page.on('pageerror',lambda e:errors.append(str(e)))
  page.on('requestfailed',lambda r:failures.append((r.url,r.failure)))
  page.on('console',lambda m:console.append((m.type,m.text)) if m.type in ('error','warning') else None)
- page.goto(a.base+'#ws=terrain&a=connecting-ridge&sv=A')
+ page.goto(a.base+'#ui=full&ws=terrain&a=connecting-ridge&sv=A')
  canvas=page.locator('.terrain-canvas canvas');expect(canvas).to_be_visible(timeout=30000)
  expect(page.locator('.terrain-quality')).to_contain_text('5 m source pixels')
  expect(page.get_by_label('Terrain appearance')).to_have_value('elevation')

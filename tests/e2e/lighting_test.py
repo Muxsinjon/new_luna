@@ -17,7 +17,7 @@ with sync_playwright() as p:
     page.on('console', lambda m: console.append((m.type, m.text)) if m.type in ('error', 'warning') else None)
     page.on('pageerror', lambda e: console.append(('pageerror', str(e))))
     page.on('requestfailed', lambda r: failures.append(r.url))
-    page.goto(BASE + '#ws=terrain&a=shackleton-rim-site04&b=connecting-ridge&sv=A&t=2027-01-01T00:00:00Z&d=14&at=2027-01-05T12:00:00Z')
+    page.goto(BASE + '#ui=full&ws=terrain&a=shackleton-rim-site04&b=connecting-ridge&sv=A&t=2027-01-01T00:00:00Z&d=14&at=2027-01-05T12:00:00Z')
     canvas = page.locator('.terrain-canvas canvas')
     expect(canvas).to_be_visible(timeout=30000)
     page.get_by_label('Lighting layer').select_option('sunlight')

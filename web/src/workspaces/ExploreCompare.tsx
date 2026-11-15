@@ -65,7 +65,9 @@ export default function ExploreCompare() {
             />
           </ErrorBoundary>
         </Suspense>
-        <MissionCheck v={data.validation} compact />
+        <div className="adv">
+          <MissionCheck v={data.validation} compact />
+        </div>
       </aside>
 
       <section className="stage" aria-labelledby="ws-title">
@@ -75,7 +77,7 @@ export default function ExploreCompare() {
             <p className="lede">
               {A.name} vs {B.name}, {fmtTime(t0, s.tz, false)} to {fmtTime(t1, s.tz, false)} ({s.durationDays} d).
             </p>
-            <p className="model-label">{MODEL_LABEL[s.vis]}</p>
+            <p className="model-label adv">{MODEL_LABEL[s.vis]}</p>
           </div>
           <div className="actions">
             <button type="button" className="btn" onClick={() => set({ ws: 'finder', searchStart: s.missionStart })}>
@@ -147,7 +149,7 @@ export default function ExploreCompare() {
         <CompareLanes a={ra.samples} b={rb.samples} t0={t0} t1={t1} />
         <CompareTable A={ra.sum} B={rb.sum} nameA={A.name} nameB={B.name} />
 
-        <details className="more">
+        <details className="more adv">
           <summary>Compare the same site on different dates</summary>
           <Suspense fallback={<Skeleton h={200} />}>
             <Compare
