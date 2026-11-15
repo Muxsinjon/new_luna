@@ -39,7 +39,7 @@ There is also a welcome screen, a guided demo and a mission summary export. **Pl
   - The full hourly file stays in `pipeline/out/` for the Python pipeline.
 - `sites.json`:
   - Top level: `{ azStepDeg, maxDistanceKm, observerHeightM, terrain, sites: Site[] }`.
-  - `Site = { id, name, group, lat (−90..90), lon (0..360 E), source, verify, elevationM, horizon: number[360/azStepDeg] }`.
+  - `Site = { id, name, group, lat (−90..90), lon (0..360 E), source, verify, elevationM, horizon: number[360/azStepDeg], horizonDistKm?: number[360/azStepDeg] }`. `horizonDistKm` is the distance of the terrain that sets the horizon at each azimuth; it drives "What blocks the Sun and Earth" (`lib/blockers.ts`).
   - `horizon[i]` is the terrain elevation angle (°) at azimuth `i·azStepDeg`, measured clockwise from north, for an observer `observerHeightM` above the surface.
 - Browser terrain:
   - `dem_polar.json/.bin` is Int16 LE in metres above the 1737.4 km sphere. It uses a south polar stereographic grid `n×n`, `scaleM` per pixel, centre `offsetPx`, and covers lat ≤ `minLat`.

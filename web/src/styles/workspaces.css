@@ -1167,3 +1167,29 @@ dialog.summary::backdrop {
 .adv-inline {
   display: contents;
 }
+
+/* What blocks the Sun and Earth */
+.blockers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--s-4);
+}
+.blockers h4 {
+  margin: 0 0 var(--s-2);
+}
+.blockers p {
+  margin: 0 0 var(--s-2);
+}
+.blockers .dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: var(--s-1);
+}
+.blockers .dot.sun {
+  background: var(--c-sun);
+}
+.blockers .dot.earth {
+  background: var(--c-earth);
+}

@@ -34,6 +34,8 @@ export interface Site {
   verify: boolean
   elevationM: number
   horizon: number[]
+  /** distance (km) of the terrain that sets the horizon at each azimuth (optional) */
+  horizonDistKm?: number[]
   custom?: boolean
   terrainNote?: string
 }

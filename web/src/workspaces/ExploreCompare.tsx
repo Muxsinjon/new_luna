@@ -1,3 +1,4 @@
+import BlockerPanel from '../components/BlockerPanel'
 import { Suspense, lazy, useMemo, useState } from 'react'
 import { makeCtx, nextEvent, sampleAt, summarize } from '../lib/analysis'
 import { fmtTime } from '../lib/format'
@@ -111,6 +112,13 @@ export default function ExploreCompare() {
           <SiteStatus site={A} slot="A" now={nowA} sunEv={ev.aS} earthEv={ev.aE} />
           <SiteStatus site={B} slot="B" now={nowB} sunEv={ev.bS} earthEv={ev.bE} />
         </div>
+        <BlockerPanel
+          sites={[
+            { slot: 'A', site: A, samples: ra.samples },
+            { slot: 'B', site: B, samples: rb.samples },
+          ]}
+          azStepDeg={data.sites.azStepDeg}
+        />
         <TimeBar />
         {s.mode === 'explore' && (
           <aside className="explain" aria-label="Plain-language explanation">

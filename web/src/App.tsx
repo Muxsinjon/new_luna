@@ -115,6 +115,7 @@ function makeCustomSite(t: Terrain, lat: number, lon: number): Site {
     custom: true,
     elevationM: h.elevationM,
     horizon: h.mask,
+    horizonDistKm: h.distKm,
     terrainNote: `Horizon computed in your browser from LOLA terrain at ${h.resolution} resolution (coarser than the listed sites).`,
   }
 }

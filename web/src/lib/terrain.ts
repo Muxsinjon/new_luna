@@ -63,9 +63,11 @@ export function customHorizon(d: Terrain, lat: number, lon: number, azStep = 0.5
   const { u } = enuBasis(lon, lat)
   const n = Math.round(360 / azStep)
   const mask = new Array<number>(n)
+  const distKm = new Array<number>(n)
   for (let i = 0; i < n; i++) {
     const az = i * azStep
-    let best = -90
+    let best = -90,
+      bestDist = 0
     for (let dist = step; dist <= maxKm; dist += step) {
       const [plat, plon] = destination(lat, lon, az, dist)
       const r = R_M + height(plat, plon)
@@ -74,9 +76,13 @@ export function customHorizon(d: Terrain, lat: number, lon: number, azStep = 0.5
       const vy = p[1] * r - s[1]
       const vz = p[2] * r - s[2]
       const el = Math.asin((vx * u[0] + vy * u[1] + vz * u[2]) / Math.hypot(vx, vy, vz)) / D2R
-      if (el > best) best = el
+      if (el > best) {
+        best = el
+        bestDist = dist
+      }
     }
     mask[i] = Math.round(best * 1000) / 1000
+    distKm[i] = Math.round(bestDist * 100) / 100
   }
-  return { mask, elevationM: Math.round(siteH), resolution: polar ? `${d.polar.meta.scaleM} m` : '~7.6 km' }
+  return { mask, distKm, elevationM: Math.round(siteH), resolution: polar ? `${d.polar.meta.scaleM} m` : '~7.6 km' }
 }
