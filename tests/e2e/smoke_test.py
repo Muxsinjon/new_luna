@@ -28,13 +28,14 @@ with sync_playwright() as p:
     ctx = browser.new_context(viewport={"width": 1440, "height": 900})
     page = ctx.new_page()
     console: list[str] = []
-    page.on("console", lambda m: console.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") else None)
+    # the headless software renderer reports 'GPU stall due to ReadPixels' for any WebGL page: a driver notice, not an app warning
+    page.on("console", lambda m: console.append(f"{m.type}: {m.text}") if m.type in ("error", "warning") and "GPU stall due to ReadPixels" not in m.text else None)
     page.on("pageerror", lambda e: console.append(f"pageerror: {e}"))
 
     def welcome():
         page.goto(BASE)
         page.wait_for_load_state("networkidle")
-        expect(page.get_by_role("heading", name=re.compile("LunaWindow — Find the Right Place"))).to_be_visible()
+        expect(page.get_by_role("heading", name=re.compile("Launching to the Moon"))).to_be_visible()
         page.get_by_role("button", name=re.compile("^Explore landing sites")).click()
         expect(page.get_by_role("heading", name="Explore and compare")).to_be_visible()
         expect(page).to_have_url(re.compile(r"ws=compare"))

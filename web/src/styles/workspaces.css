@@ -939,3 +939,128 @@ dialog.summary::backdrop {
   border-radius: var(--r-sm);
   border: 1px solid var(--c-line);
 }
+
+/* Redesign: scroll story (welcome) */
+.story {
+  position: relative;
+  overflow-x: clip;
+}
+.story-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--c-sky-night);
+}
+.story-canvas canvas {
+  display: block;
+}
+.story-canvas.story-fallback {
+  background: radial-gradient(circle at 70% 40%, var(--c-terrain-edge) 0 8%, var(--c-sky-night) 30%);
+}
+.story-step {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: var(--s-6, 32px) clamp(16px, 6vw, 96px);
+  gap: var(--s-4);
+}
+.story-step.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(40px, 6.5vw, 92px);
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  color: var(--c-site-a);
+  max-width: 14ch;
+  margin: 0;
+}
+.story-step.hero h1 span {
+  display: block;
+  color: var(--c-text-muted);
+  font-weight: 400;
+  font-size: 0.56em;
+  margin-top: var(--s-3);
+}
+.story-kicker {
+  color: var(--c-accent);
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  margin: 0;
+}
+.story-lede {
+  color: var(--c-text-muted);
+  font-size: var(--fs-3);
+}
+.story-card {
+  max-width: 34rem;
+  padding: var(--s-5);
+  border: 1px solid color-mix(in srgb, var(--c-line) 70%, transparent);
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--c-bg) 62%, transparent);
+  backdrop-filter: blur(10px);
+  animation: story-in linear both;
+  animation-timeline: view();
+  animation-range: entry 10% cover 35%;
+}
+.story-card h2,
+.story-step.final h2 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.4vw, 44px);
+  line-height: 1.05;
+  margin: 0 0 var(--s-3);
+  color: var(--c-site-a);
+}
+.story-card p {
+  color: var(--c-text);
+  font-size: var(--fs-3);
+  line-height: 1.5;
+}
+.story-live {
+  color: var(--c-accent) !important;
+  font-size: var(--fs-1) !important;
+}
+.story-pins {
+  margin: 0 0 var(--s-3);
+  padding-left: var(--s-5);
+  font-size: var(--fs-3);
+}
+.story-pins li::marker {
+  color: var(--c-accent);
+}
+.story-step.final {
+  align-items: stretch;
+  background: linear-gradient(transparent, color-mix(in srgb, var(--c-bg) 85%, transparent) 30%);
+}
+.story-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--s-3);
+}
+.story-actions .entry-card {
+  background: color-mix(in srgb, var(--c-surface) 70%, transparent);
+  backdrop-filter: blur(8px);
+}
+.story-credit {
+  color: var(--c-text-muted);
+  font-size: var(--fs-0);
+  max-width: 60rem;
+}
+@keyframes story-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-card {
+    animation: none;
+  }
+}
