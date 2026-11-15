@@ -14,7 +14,7 @@ Updated 2026-11-15. Branch `milestone-9` on `Muxsinjon/new_luna`, based on Miles
 - **Rules:** checked against the official 2026 Project Submission Guide.
 - **Fixed:** repeated or cancelled 10 MB hazard downloads (shared session cache).
 - **Open team actions:**
-  - make the repository public or deploy it (it is private now);
+  - the repository is now public (2026-11-15); optionally deploy the site;
   - record the 30 s demo or make the 7 slides;
   - fill in the submission form before 2026-11-15 23:59 local-event time.
 

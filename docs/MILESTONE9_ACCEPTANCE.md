@@ -106,7 +106,7 @@ Evidence screenshots are in `docs/screenshots/demo/`.
 
 ## Unresolved items (plain statement)
 
-1. **Repository visibility and deployment (team decision):** `Muxsinjon/new_luna` is **private**, and its Pages workflow is manual-only. Judges need a public link, either by making the repository public or by deploying.
+1. **Repository visibility and deployment:** at the user's request, `Muxsinjon/new_luna` was made **public** on 2026-11-15, and it opens without a login. Its commit history includes one teammate's personal email on 7 commits; the user chose to publish as is. The Pages workflow is still manual-only, so no live site of the current version is deployed.
    - The older public site (`muxsinjon.github.io/lunawindow`) shows the pre-milestone version.
    - Per the release-control rule, nothing has been published or deployed without your explicit decision.
 2. **Demo:** the demo video or slides, team names and the submission form are still to be produced by the team; see [DEMO_SCRIPT.md](DEMO_SCRIPT.md) and [SUBMISSION.md](SUBMISSION.md). The deadline is **2026-11-15 23:59 local-event time**.

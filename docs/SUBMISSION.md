@@ -67,5 +67,5 @@ The rules below were read from the official [Project Submission Guide](https://w
 ## Before clicking Submit (team actions, not automated)
 
 1. Record the demo (see [DEMO_SCRIPT.md](DEMO_SCRIPT.md)), upload it publicly, and test the link in a private window.
-2. Decide whether to make the repository public (`Muxsinjon/new_luna` is private) or to deploy the site. Judges need a link that works without a login.
+2. `Muxsinjon/new_luna` was made **public** on 2026-11-15; check that https://github.com/Muxsinjon/new_luna opens in a private window. Deploying the site (GitHub Pages, manual workflow) is optional.
 3. Fill in the fields above, then tick both boxes and submit before 23:59 local time.
