@@ -3,7 +3,6 @@ import { loadTerrainIndex, terrainSiteFor, type TerrainIndex } from '../lib/terr
 import { type Sample, SUN_RADIUS_DEG, makeCtx, nextEvent, sampleAt, series, vectorsAt } from '../lib/analysis'
 import { siteDigest } from '../lib/siteDigest'
 import SiteCards from '../components/SiteCards'
-import SkyPanorama from '../components/SkyPanorama'
 import { fmtAz, fmtDeg, fmtPct, fmtTime } from '../lib/format'
 import { horizonAt } from '../lib/geometry'
 import { earthPhase } from '../lib/physics/earthPhase'
@@ -15,6 +14,7 @@ import TimeBar from '../components/TimeBar'
 import { Chip, useWidth } from '../components/ui'
 
 const SurfaceFirstPerson = lazy(() => import('../components/SurfaceFirstPerson'))
+const MoonView = lazy(() => import('../components/MoonView'))
 
 const COMPASS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
 const wrap180 = (d: number) => ((((d + 180) % 360) + 360) % 360) - 180
@@ -40,10 +40,9 @@ export default function SurfaceView() {
   const now = useMemo(() => sampleAt(ctx, data.eph, s.selectedTime), [ctx, data, s.selectedTime])
   const ahead = useMemo(() => series(ctx, data.eph, s.selectedTime, s.selectedTime + 30 * DAY), [ctx, data, s.selectedTime])
   const digest = useMemo(() => siteDigest(ahead, s.vis), [ahead, s.vis])
-  const path = useMemo(() => ahead.filter((_, i) => i % 3 === 0), [ahead])
   const sunEv = useMemo(() => nextEvent(ctx, data.eph, s.selectedTime, 'sun', s.vis), [ctx, data, s.selectedTime, s.vis])
   const earthEv = useMemo(() => nextEvent(ctx, data.eph, s.selectedTime, 'earth', s.vis), [ctx, data, s.selectedTime, s.vis])
-  const [lookAround, setLookAround] = useState(false)
+  const [moonView, setMoonView] = useState(false)
   const [view, setView] = useState({ az: now.sunAz, el: 5 })
   const [fov, setFov] = useState(90)
   const [ex, setEx] = useState(1)
@@ -141,32 +140,32 @@ export default function SurfaceView() {
           <button
             type="button"
             role="radio"
-            aria-checked={!show3d && !lookAround}
-            className={!show3d && !lookAround ? 'on' : ''}
+            aria-checked={!show3d && !moonView}
+            className={!show3d && !moonView ? 'on' : ''}
             onClick={() => {
-              setLookAround(false)
+              setMoonView(false)
               set({ surface3d: false })
             }}
           >
-            Whole sky
+            2D view
           </button>
           <button
             type="button"
             role="radio"
-            aria-checked={!show3d && lookAround}
-            className={!show3d && lookAround ? 'on' : ''}
+            aria-checked={!show3d && moonView}
+            className={!show3d && moonView ? 'on' : ''}
             onClick={() => {
-              setLookAround(true)
+              setMoonView(true)
               set({ surface3d: false })
             }}
           >
-            Look around
+            View from the Moon
           </button>
           <button
             type="button"
             role="radio"
             aria-checked={show3d}
-            className={show3d ? 'on' : ''}
+            className={`adv ${show3d ? 'on' : ''}`}
             disabled={!terrainInfo}
             onClick={() => set({ surface3d: true })}
           >
@@ -174,7 +173,7 @@ export default function SurfaceView() {
           </button>
         </div>
         {!terrainInfo && terrainIndexed && (
-          <p className="hint" data-testid="fp-unavailable">
+          <p className="hint adv" data-testid="fp-unavailable">
             No processed NASA 5 m terrain covers {st.name}, so the 3D first-person view is not available here. This 360° panorama uses the
             LOLA {st.lat <= -75 ? '240 m' : 'regional'} horizon; no terrain detail is invented.
           </p>
@@ -183,8 +182,10 @@ export default function SurfaceView() {
           <Suspense fallback={<p role="status">Loading the first-person view…</p>}>
             <SurfaceFirstPerson site={st} slot={s.surfaceSite} info={terrainInfo} />
           </Suspense>
-        ) : !lookAround ? (
-          <SkyPanorama horizon={st.horizon} step={data.sites.azStepDeg} now={now} path={path} vis={s.vis} siteName={st.name} />
+        ) : moonView ? (
+          <Suspense fallback={<p role="status">Loading the view from the Moon…</p>}>
+            <MoonView eph={data.eph} t={s.selectedTime} lat={st.lat} lon={st.lon} siteName={st.name} />
+          </Suspense>
         ) : (
           <>
             <div className="sv-tools">
@@ -194,7 +195,7 @@ export default function SurfaceView() {
               <button type="button" className="btn" onClick={() => look(now.earthAz, now.earthEl)}>
                 Look at Earth
               </button>
-              <label className="field inline">
+              <label className="field inline adv">
                 <span className="field-label">Field of view</span>
                 <select value={fov} onChange={(e) => setFov(+e.target.value)}>
                   {[30, 60, 90, 120, 180].map((f) => (
@@ -204,7 +205,7 @@ export default function SurfaceView() {
                   ))}
                 </select>
               </label>
-              <label className="field inline">
+              <label className="field inline adv">
                 <span className="field-label">Vertical scale</span>
                 <select value={ex} onChange={(e) => setEx(+e.target.value)}>
                   <option value={1}>True angles (1×)</option>
@@ -319,7 +320,7 @@ export default function SurfaceView() {
                     </Chip>
                   )}
                 </div>
-                <p className="num">
+                <p className="num adv">
                   Azimuth {fmtAz(now.sunAz)}, elevation {fmtDeg(now.sunEl)}
                   {terrainMode && `, terrain ${fmtDeg(now.sunHorizon)}`}
                 </p>
@@ -336,7 +337,7 @@ export default function SurfaceView() {
                     </Chip>
                   )}
                 </div>
-                <p className="num">
+                <p className="num adv">
                   Azimuth {fmtAz(now.earthAz)}, elevation {fmtDeg(now.earthEl)}
                   {terrainMode && `, terrain ${fmtDeg(now.earthHorizon)}`}, {fmtPct(earthPhaseNow.illuminated * 100)} of Earth’s disc sunlit
                   (phase angle {fmtDeg((earthPhaseNow.phaseAngle * 180) / Math.PI)}), apparent diameter{' '}

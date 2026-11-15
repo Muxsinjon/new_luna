@@ -89,7 +89,7 @@ with sync_playwright() as pw:
     page.reload()
     expect(page.get_by_test_id('fp-unavailable')).to_be_visible(timeout=20000)
     expect(page.get_by_role('radio', name='3D first person (5 m terrain)')).to_be_disabled()
-    expect(page.get_by_role('radio', name='Whole sky')).to_be_checked()
+    expect(page.get_by_role('radio', name='2D view')).to_be_checked()
     # load-error path: missing horizon inputs are reported, not hidden
     page.route('**/site01/illumination/illumination.json', lambda r: r.fulfill(status=404, body='missing'))
     page.goto(a.base + f'#ui=full&ws=surface&a=connecting-ridge&sv=A&fp=1&t={T}&d=14&at={T}')

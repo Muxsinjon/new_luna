@@ -2,6 +2,10 @@
 
 All dates 2026 (UTC+local event time). Each milestone has an acceptance report in `docs/` and a recovery patch in `milestones/`.
 
+## Simpler dashboard and a view from the Moon (2026-11-15)
+- **Surface View:** the 2D panorama is the default again. A new **View from the Moon** shows the LRO Moon with the Sun and Earth in their real directions, seen from 15 km above the site. The 5 m shadow view is now in "Show all controls".
+- **Explore & Compare:** each site gets four plain-word cards (Sun now, Earth now, sunlight and Earth for the rest of the mission). Charts and tables are in "Show all controls".
+
 ## Simpler map and Surface View (2026-11-15)
 Ideas adapted (no code copied) from astoreyai/lunar-lighting-planner, an independent project:
 - **South pole map, lit by the real Sun:** every 960 m LOLA cell is marched toward the Sun (or Earth) at the selected time, with exact spherical geometry and the upper-limb rule. Warm ground is sunlit and dark ground is in shadow. A play button and slider move through the mission. The year-average PGDA layers remain in the expert view.

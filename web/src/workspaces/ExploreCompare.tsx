@@ -1,4 +1,6 @@
 import BlockerPanel from '../components/BlockerPanel'
+import SiteCards from '../components/SiteCards'
+import { siteDigest } from '../lib/siteDigest'
 import { Suspense, lazy, useMemo, useState } from 'react'
 import { makeCtx, nextEvent, sampleAt, summarize } from '../lib/analysis'
 import { fmtTime } from '../lib/format'
@@ -87,12 +89,12 @@ export default function ExploreCompare() {
             <button type="button" className="btn" onClick={() => set({ ws: 'surface' })}>
               Inspect in Surface View
             </button>
-            <button type="button" className="btn" onClick={() => store.openSummary({ kind: 'compare' })}>
+            <button type="button" className="btn adv" onClick={() => store.openSummary({ kind: 'compare' })}>
               Generate mission summary
             </button>
             <button
               type="button"
-              className="btn quiet"
+              className="btn quiet adv"
               onClick={() =>
                 set({
                   siteA: DEFAULT_STATE.siteA,
@@ -108,20 +110,42 @@ export default function ExploreCompare() {
           </div>
         </div>
 
-        <div className="status-pair">
+        <div className="site-duo">
+          {(
+            [
+              ['A', A, ra.samples, ev.aS, ev.aE],
+              ['B', B, rb.samples, ev.bS, ev.bE],
+            ] as const
+          ).map(([slot, st, smp, se, ee]) => {
+            const i = smp.findIndex((x) => x.t >= s.selectedTime)
+            const ahead = i < 0 ? [] : smp.slice(i)
+            const d = siteDigest(ahead.length ? ahead : smp, s.vis)
+            return (
+              <section key={slot} className={`duo-col duo-${slot.toLowerCase()}`}>
+                <h3 className="duo-title">
+                  <span className={`slot slot-${slot.toLowerCase()}`}>{slot}</span> {st.name}
+                </h3>
+                <SiteCards d={d} sunEv={se} earthEv={ee} t={s.selectedTime} span="rest of the mission" expectedH={d?.hours ?? 0} />
+              </section>
+            )
+          })}
+        </div>
+        <div className="status-pair adv">
           <SiteStatus site={A} slot="A" now={nowA} sunEv={ev.aS} earthEv={ev.aE} />
           <SiteStatus site={B} slot="B" now={nowB} sunEv={ev.bS} earthEv={ev.bE} />
         </div>
-        <BlockerPanel
-          sites={[
-            { slot: 'A', site: A, samples: ra.samples },
-            { slot: 'B', site: B, samples: rb.samples },
-          ]}
-          azStepDeg={data.sites.azStepDeg}
-        />
+        <div className="adv">
+          <BlockerPanel
+            sites={[
+              { slot: 'A', site: A, samples: ra.samples },
+              { slot: 'B', site: B, samples: rb.samples },
+            ]}
+            azStepDeg={data.sites.azStepDeg}
+          />
+        </div>
         <TimeBar />
         {s.mode === 'explore' && (
-          <aside className="explain" aria-label="Plain-language explanation">
+          <aside className="explain adv" aria-label="Plain-language explanation">
             <h3>What you are seeing</h3>
             <p>
               <b>Site A, {A.name}.</b> {reason(nowA, 'sun', s.vis)} {reason(nowA, 'earth', s.vis)}
@@ -136,26 +160,28 @@ export default function ExploreCompare() {
             </p>
           </aside>
         )}
-        <ElevationChart
-          body="sun"
-          t0={t0}
-          t1={t1}
-          series={[
-            { slot: 'A', name: A.name, samples: ra.samples },
-            { slot: 'B', name: B.name, samples: rb.samples },
-          ]}
-        />
-        <ElevationChart
-          body="earth"
-          t0={t0}
-          t1={t1}
-          series={[
-            { slot: 'A', name: A.name, samples: ra.samples },
-            { slot: 'B', name: B.name, samples: rb.samples },
-          ]}
-        />
         <CompareLanes a={ra.samples} b={rb.samples} t0={t0} t1={t1} />
-        <CompareTable A={ra.sum} B={rb.sum} nameA={A.name} nameB={B.name} />
+        <div className="adv">
+          <ElevationChart
+            body="sun"
+            t0={t0}
+            t1={t1}
+            series={[
+              { slot: 'A', name: A.name, samples: ra.samples },
+              { slot: 'B', name: B.name, samples: rb.samples },
+            ]}
+          />
+          <ElevationChart
+            body="earth"
+            t0={t0}
+            t1={t1}
+            series={[
+              { slot: 'A', name: A.name, samples: ra.samples },
+              { slot: 'B', name: B.name, samples: rb.samples },
+            ]}
+          />
+          <CompareTable A={ra.sum} B={rb.sum} nameA={A.name} nameB={B.name} />
+        </div>
 
         <details className="more adv">
           <summary>Compare the same site on different dates</summary>

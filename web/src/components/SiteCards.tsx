@@ -9,9 +9,23 @@ function countdown(ev: NextEvent, t: number): string {
   return `${ev.kind} in ${fmtHoursApprox(ev.time - t)} (to the hour).`
 }
 
-export default function SiteCards({ d, sunEv, earthEv, t }: { d: SiteDigest | null; sunEv: NextEvent; earthEv: NextEvent; t: number }) {
+export default function SiteCards({
+  d,
+  sunEv,
+  earthEv,
+  t,
+  span = 'next 30 days',
+  expectedH = 30 * 24,
+}: {
+  d: SiteDigest | null
+  sunEv: NextEvent
+  earthEv: NextEvent
+  t: number
+  span?: string
+  expectedH?: number
+}) {
   if (!d) return <p className="hint">Insufficient data: this date is outside the supported range.</p>
-  const short = d.hours < 29 * 24
+  const short = d.hours < expectedH - 24
   return (
     <div className="site-cards">
       <section className={`site-card ${d.sunState === 'sunlit' ? 'on-sun' : 'off'}`}>
@@ -32,12 +46,12 @@ export default function SiteCards({ d, sunEv, earthEv, t }: { d: SiteDigest | nu
         </p>
       </section>
       <section className="site-card">
-        <h3>Sunlight, next 30 days</h3>
+        <h3>Sunlight, {span}</h3>
         <p className="big">{fmtPct(d.sunPct)}</p>
         <p>Longest night: {fmtHours(d.longestNightH)}.</p>
       </section>
       <section className="site-card">
-        <h3>Earth, next 30 days</h3>
+        <h3>Earth, {span}</h3>
         <p className="big">
           {d.earth === 'always' ? 'Always in view' : d.earth === 'never' ? 'Never in view' : `In view ${fmtPct(d.earthPct)}`}
         </p>
@@ -45,7 +59,7 @@ export default function SiteCards({ d, sunEv, earthEv, t }: { d: SiteDigest | nu
           {d.earth === 'sometimes'
             ? 'Line of sight to Earth comes and goes.'
             : d.earth === 'always'
-              ? 'Line of sight to Earth all month.'
+              ? 'Line of sight to Earth the whole time.'
               : 'No direct line of sight: a relay would be needed.'}
         </p>
       </section>

@@ -21,7 +21,7 @@ def finder(page):
 
 
 def surface(page):
-    page.get_by_role("radio", name="Look around").click()
+    page.get_by_role("radio", name="2D view").click()
     page.get_by_role("button", name="Look at the Sun").click()
     page.wait_for_timeout(300)
 

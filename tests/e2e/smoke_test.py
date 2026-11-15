@@ -91,7 +91,7 @@ with sync_playwright() as p:
         why.get_by_role("button", name="Open in Surface View").click()
         expect(page.get_by_role("heading", name=re.compile("Standing at"))).to_be_visible()
         expect(page.locator(".site-cards")).to_contain_text("Sun now")
-        page.get_by_role("radio", name="Look around").click()
+        page.get_by_role("radio", name="2D view").click()
         page.get_by_role("button", name="Look at the Sun").click()
         expect(page.locator(".sv-readout")).to_contain_text("Azimuth")
 

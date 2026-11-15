@@ -19,7 +19,7 @@ with sync_playwright() as p:
     page.goto(BASE + '#ui=full&ws=surface&a=connecting-ridge&sv=A&fp=1')
     page.reload()
     expect(page.get_by_role('alert').filter(has_text='WebGL is unavailable')).to_be_visible(timeout=40000)
-    page.get_by_role('radio', name='Look around').click()
+    page.get_by_role('radio', name='2D view').click()
     expect(page.get_by_role('button', name='Look at the Sun')).to_be_visible()
     page.goto(BASE + '#ui=full&ws=compare&a=connecting-ridge&b=nobile-rim-1-site06')
     page.reload()
